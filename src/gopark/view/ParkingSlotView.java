@@ -48,6 +48,12 @@ public class ParkingSlotView extends JPanel {
         newEntryButton.setBorder(new EmptyBorder(10, 20, 10, 20));
         newEntryButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+        newEntryButton.addActionListener(e -> {
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            new NewEntryDialog(parentFrame);
+        });
+
+
         header.add(newEntryButton, BorderLayout.EAST);
 
         add(header, BorderLayout.NORTH);
@@ -207,8 +213,19 @@ public class ParkingSlotView extends JPanel {
         this(new ArrayList<>());
     }
 
-    public JLabel getAvailableLabel() { return availableLabel; }
-    public JLabel getOccupiedLabel() { return occupiedLabel; }
-    public JLabel getTotalLabel() { return totalLabel; }
-    public JButton getNewEntryButton() { return newEntryButton; }
+    public JLabel getAvailableLabel() {
+        return availableLabel;
+    }
+
+    public JLabel getOccupiedLabel() {
+        return occupiedLabel;
+    }
+
+    public JLabel getTotalLabel() {
+        return totalLabel;
+    }
+
+    public JButton getNewEntryButton() {
+        return newEntryButton;
+    }
 }
