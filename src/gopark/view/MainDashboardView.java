@@ -1,5 +1,7 @@
 package gopark.view;
 
+import gopark.controller.ParkingSlotController;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -26,7 +28,11 @@ public class MainDashboardView extends JFrame {
 
         // Add each view
         mainPanel.add(new DashboardView(), "Dashboard");
-        mainPanel.add(new ParkingSlotView(), "Parking");
+
+        // use controller to get the fully-initialized parking view
+        ParkingSlotController parkingController = new ParkingSlotController();
+        mainPanel.add(parkingController.getView(), "Parking");
+
         mainPanel.add(new TransactionsView(), "Transactions");
         mainPanel.add(new RevenueView(), "Revenue");
         mainPanel.add(new SettingsView(), "Settings");

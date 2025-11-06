@@ -37,7 +37,6 @@ public class ParkingSlotView extends JPanel {
 
         titlePanel.add(title);
         titlePanel.add(subtitle);
-
         header.add(titlePanel, BorderLayout.WEST);
 
         newEntryButton = new JButton("+ New Entry");
@@ -47,13 +46,6 @@ public class ParkingSlotView extends JPanel {
         newEntryButton.setFocusPainted(false);
         newEntryButton.setBorder(new EmptyBorder(10, 20, 10, 20));
         newEntryButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        newEntryButton.addActionListener(e -> {
-            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-            new NewEntryDialog(parentFrame);
-        });
-
-
         header.add(newEntryButton, BorderLayout.EAST);
 
         add(header, BorderLayout.NORTH);
@@ -68,18 +60,14 @@ public class ParkingSlotView extends JPanel {
         statPanel.setBackground(Color.WHITE);
         statPanel.setBorder(new EmptyBorder(10, 0, 20, 0));
 
-        JPanel availableCard = createStatCard("Available", "20 Slots");
-        availableLabel = (JLabel) availableCard.getClientProperty("valueLabel");
+        availableLabel = new JLabel("0 Slots");
+        occupiedLabel = new JLabel("0 Slots");
+        totalLabel = new JLabel("0 Slots");
 
-        JPanel occupiedCard = createStatCard("Occupied", "15 Slots");
-        occupiedLabel = (JLabel) occupiedCard.getClientProperty("valueLabel");
+        statPanel.add(createStatCard("Available", availableLabel));
+        statPanel.add(createStatCard("Occupied", occupiedLabel));
+        statPanel.add(createStatCard("Total Capacity", totalLabel));
 
-        JPanel totalCard = createStatCard("Total Capacity", "35 Slots");
-        totalLabel = (JLabel) totalCard.getClientProperty("valueLabel");
-
-        statPanel.add(availableCard);
-        statPanel.add(occupiedCard);
-        statPanel.add(totalCard);
         mainContent.add(statPanel);
 
         // === INSTRUCTION BANNER ===
@@ -98,21 +86,24 @@ public class ParkingSlotView extends JPanel {
         instructions.setFont(new Font("Arial", Font.PLAIN, 13));
         instructions.setForeground(new Color(100, 0, 0));
         instructionPanel.add(instructions, BorderLayout.CENTER);
-
         mainContent.add(instructionPanel);
         mainContent.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // === CAR PARKING SECTION ===
-        mainContent.add(createSection("Car Parking Status", "Car", slots));
-        mainContent.add(Box.createRigidArea(new Dimension(0, 25)));
+        // === CAR AND MOTORCYCLE PANELS ===
+        carPanel = createSectionPanel("Car Parking Status");
+        motorcyclePanel = createSectionPanel("Motorcycle Parking Status");
 
-        // === MOTORCYCLE PARKING SECTION ===
-        mainContent.add(createSection("Motorcycle Parking Status", "Motorcycle", slots));
+        mainContent.add(carPanel);
+        mainContent.add(Box.createRigidArea(new Dimension(0, 25)));
+        mainContent.add(motorcyclePanel);
 
         add(mainContent, BorderLayout.CENTER);
+
+        // Load initial data
+        updateSlots(slots);
     }
 
-    private JPanel createStatCard(String title, String value) {
+    private JPanel createStatCard(String title, JLabel valueLabel) {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(Color.WHITE);
@@ -121,65 +112,48 @@ public class ParkingSlotView extends JPanel {
                 new EmptyBorder(20, 25, 20, 25)
         ));
         card.setPreferredSize(new Dimension(180, 100));
-        card.setOpaque(true);
-        card.setAlignmentY(Component.TOP_ALIGNMENT);
 
         JLabel titleLabel = new JLabel(title);
         titleLabel.setFont(new Font("Arial", Font.PLAIN, 15));
         titleLabel.setForeground(Color.GRAY);
 
-        JLabel valueLabel = new JLabel(value);
         valueLabel.setFont(new Font("Arial", Font.BOLD, 22));
         valueLabel.setForeground(Color.BLACK);
 
         card.add(titleLabel);
         card.add(Box.createVerticalStrut(8));
         card.add(valueLabel);
-        card.putClientProperty("valueLabel", valueLabel);
 
         return card;
     }
 
-    private JPanel createSection(String sectionTitle, String type, List<ParkingSlot> slots) {
+    private JPanel createSectionPanel(String sectionTitle) {
         JPanel section = new JPanel();
-        section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
+        section.setLayout(new BorderLayout());
         section.setBackground(Color.WHITE);
 
         JLabel title = new JLabel(sectionTitle);
         title.setFont(new Font("Arial", Font.BOLD, 16));
         title.setBorder(new EmptyBorder(5, 0, 10, 0));
-        section.add(title);
+        section.add(title, BorderLayout.NORTH);
 
-        JPanel container = new JPanel(new BorderLayout());
-        container.setBackground(Color.WHITE);
-        container.setBorder(BorderFactory.createCompoundBorder(
+        JPanel grid = new JPanel();
+        grid.setBackground(Color.WHITE);
+        grid.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(220, 220, 220), 1, true),
                 new EmptyBorder(15, 15, 15, 15)
         ));
 
-        JPanel gridPanel;
-        if (type.equalsIgnoreCase("Car")) {
-            gridPanel = new JPanel(new GridLayout(2, 9, 10, 10));
-        } else {
-            gridPanel = new JPanel(new GridLayout(1, 17, 10, 10));
-        }
-
-        gridPanel.setBackground(Color.WHITE);
-        populateSlots(type, slots, gridPanel);
-
-        container.add(gridPanel, BorderLayout.CENTER);
-        section.add(container);
-
+        section.add(grid, BorderLayout.CENTER);
         return section;
     }
 
-    private void populateSlots(String type, List<ParkingSlot> slots, JPanel panel) {
-        panel.removeAll();
+    private void populateGrid(JPanel grid, String type, List<ParkingSlot> slots) {
+        grid.removeAll();
+        grid.setLayout(type.equalsIgnoreCase("Car") ?
+                new GridLayout(2, 9, 10, 10) : new GridLayout(1, 17, 10, 10));
 
-        // Demo placeholder slots if empty
-        List<ParkingSlot> data = slots.isEmpty() ? getSampleSlots(type) : slots;
-
-        for (ParkingSlot slot : data) {
+        for (ParkingSlot slot : slots) {
             if (!slot.getType().equalsIgnoreCase(type)) continue;
 
             JButton btn = new JButton(slot.getId());
@@ -189,43 +163,29 @@ public class ParkingSlotView extends JPanel {
             btn.setForeground(Color.WHITE);
             btn.setBackground(slot.isOccupied() ? new Color(220, 53, 69) : new Color(40, 167, 69));
             btn.setBorder(new LineBorder(Color.WHITE, 2, true));
-            panel.add(btn);
+            grid.add(btn);
         }
+
+        grid.revalidate();
+        grid.repaint();
     }
 
-    // demo placeholders
-    private List<ParkingSlot> getSampleSlots(String type) {
-        List<ParkingSlot> list = new ArrayList<>();
-        if (type.equalsIgnoreCase("Car")) {
-            for (int i = 1; i <= 18; i++) {
-                list.add(new ParkingSlot("C" + i, i % 3 == 0, "Car"));
-            }
-        } else {
-            for (int i = 1; i <= 17; i++) {
-                list.add(new ParkingSlot("M" + i, i % 2 == 0, "Motorcycle"));
-            }
-        }
-        return list;
+    public void updateSlots(List<ParkingSlot> slots) {
+        long occupied = slots.stream().filter(ParkingSlot::isOccupied).count();
+        long available = slots.size() - occupied;
+        long total = slots.size();
+
+        availableLabel.setText(available + " Slots");
+        occupiedLabel.setText(occupied + " Slots");
+        totalLabel.setText(total + " Slots");
+
+        populateGrid((JPanel) ((BorderLayout) carPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER), "Car", slots);
+        populateGrid((JPanel) ((BorderLayout) motorcyclePanel.getLayout()).getLayoutComponent(BorderLayout.CENTER), "Motorcycle", slots);
     }
 
-    // default constructor
-    public ParkingSlotView() {
-        this(new ArrayList<>());
-    }
-
-    public JLabel getAvailableLabel() {
-        return availableLabel;
-    }
-
-    public JLabel getOccupiedLabel() {
-        return occupiedLabel;
-    }
-
-    public JLabel getTotalLabel() {
-        return totalLabel;
-    }
-
-    public JButton getNewEntryButton() {
-        return newEntryButton;
-    }
+    // === Getters ===
+    public JLabel getAvailableLabel() { return availableLabel; }
+    public JLabel getOccupiedLabel() { return occupiedLabel; }
+    public JLabel getTotalLabel() { return totalLabel; }
+    public JButton getNewEntryButton() { return newEntryButton; }
 }
