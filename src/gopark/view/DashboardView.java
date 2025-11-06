@@ -8,7 +8,7 @@ public class DashboardView extends JPanel {
 
     public DashboardView() {
         setLayout(new BorderLayout());
-        setBackground(new Color(245, 245, 245));
+        setBackground(Color.WHITE);
 
         // Header
         JPanel headerPanel = new JPanel();
@@ -18,12 +18,12 @@ public class DashboardView extends JPanel {
 
         JLabel title = new JLabel("Dashboard Overview");
         title.setFont(new Font("Arial", Font.BOLD, 22));
-        headerPanel.add(title, BorderLayout.NORTH);
+        headerPanel.add(title);
 
         JLabel subtitle = new JLabel("Monitor parking activity and performance metrics.");
         subtitle.setFont(new Font("Arial", Font.PLAIN, 14));
         subtitle.setForeground(Color.GRAY);
-        headerPanel.add(subtitle, BorderLayout.CENTER);
+        headerPanel.add(subtitle);
 
         add(headerPanel, BorderLayout.NORTH);
 
@@ -31,7 +31,7 @@ public class DashboardView extends JPanel {
         JPanel content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setBackground(new Color(245, 245, 245));
-        content.setBorder(new EmptyBorder(10, 40, 40, 40));
+        content.setBorder(new EmptyBorder(10, 0, 0, 0));
 
         // Stat Card
         JPanel topCardsPanel = new JPanel(new GridLayout(1, 4, 20, 0));
@@ -43,7 +43,7 @@ public class DashboardView extends JPanel {
         topCardsPanel.add(createStatsCard("Total Revenue", "₱0.00", "This Month"));
 
         content.add(topCardsPanel);
-        content.add(Box.createRigidArea(new Dimension(0, 25)));
+        content.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // Parking Status
         JPanel statusPanel = new JPanel();
