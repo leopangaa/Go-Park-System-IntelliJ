@@ -171,7 +171,7 @@ public class TransactionsView extends JPanel {
             if (row[0] != null) {
                 try {
                     int transactionId = Integer.parseInt(row[0].toString());
-                    row[0] = TransactionDAO.formatReceiptNumber(transactionId);
+                    row[0] = formatReceiptNumber(transactionId);
                 } catch (NumberFormatException e) {
                     row[0] = row[0].toString();
                 }
@@ -214,6 +214,10 @@ public class TransactionsView extends JPanel {
 
     public void refreshTransactions() {
         loadTransactions();
+    }
+
+    public static String formatReceiptNumber(int transactionId) {
+        return String.format("TID-%05d", transactionId);
     }
 
     private class StatusCellRenderer extends DefaultTableCellRenderer {

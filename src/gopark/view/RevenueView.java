@@ -1,16 +1,25 @@
 package gopark.view;
 
+import gopark.controller.RevenueController;
+import gopark.model.DBConnection;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class RevenueView extends JPanel {
 
+    private JLabel lblTodayRevenue;
+    private JLabel lblMonthlyRevenue;
+
+    private RevenueController revenueController;   // ✅ instance controller
+
     public RevenueView() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
+
+        revenueController = new RevenueController(DBConnection.getConnection());
 
         // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -37,12 +46,17 @@ public class RevenueView extends JPanel {
         statsPanel.setBorder(new EmptyBorder(10, 40, 20, 40));
         statsPanel.setBackground(Color.WHITE);
 
-        statsPanel.add(createStatsCard("Today's Revenue", "₱0.00"));
-        statsPanel.add(createStatsCard("This Month’s Revenue", "₱0.00"));
+        lblTodayRevenue = new JLabel("₱0.00");
+        lblMonthlyRevenue = new JLabel("₱0.00");
+
+        statsPanel.add(createStatsCard("Today's Revenue", lblTodayRevenue));
+        statsPanel.add(createStatsCard("This Month’s Revenue", lblMonthlyRevenue));
 
         add(statsPanel, BorderLayout.CENTER);
 
-        // Chart
+        loadRevenueStats();
+
+        // Chart Panel Container
         JPanel chartContainer = new JPanel(new BorderLayout());
         chartContainer.setBorder(new EmptyBorder(10, 40, 40, 40));
         chartContainer.setBackground(Color.WHITE);
@@ -57,29 +71,23 @@ public class RevenueView extends JPanel {
 
         chartContainer.add(chartHeader, BorderLayout.NORTH);
 
-        // Sample Data
-        Map<String, Integer> monthlyRevenue = new LinkedHashMap<>();
-        monthlyRevenue.put("Jan", 45000);
-        monthlyRevenue.put("Feb", 52000);
-        monthlyRevenue.put("Mar", 48000);
-        monthlyRevenue.put("Apr", 60000);
-        monthlyRevenue.put("May", 58000);
-        monthlyRevenue.put("Jun", 65000);
-        monthlyRevenue.put("Jul", 70000);
-        monthlyRevenue.put("Aug", 72000);
-        monthlyRevenue.put("Sep", 68000);
-        monthlyRevenue.put("Oct", 74000);
-        monthlyRevenue.put("Nov", 76000);
-        monthlyRevenue.put("Dec", 80000);
+        Map<String, Integer> monthlyRevenueData = revenueController.getMonthlyRevenue();
 
-        RevenueChart chart = new RevenueChart(monthlyRevenue);
+        RevenueChart chart = new RevenueChart(monthlyRevenueData);
         chartContainer.add(chart, BorderLayout.CENTER);
 
         add(chartContainer, BorderLayout.SOUTH);
     }
 
-    // Create Stat Card
-    private JPanel createStatsCard(String label, String value) {
+    private void loadRevenueStats() {
+        double todaysRevenue = revenueController.getTodayRevenue();
+        double monthRevenue = revenueController.getMonthRevenue();
+
+        lblTodayRevenue.setText("₱" + todaysRevenue);
+        lblMonthlyRevenue.setText("₱" + monthRevenue);
+    }
+
+    private JPanel createStatsCard(String label, JLabel valueLabel) {
         JPanel card = new JPanel(new GridLayout(1, 2));
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
@@ -94,20 +102,18 @@ public class RevenueView extends JPanel {
         JLabel title = new JLabel(label);
         title.setFont(new Font("Arial", Font.BOLD, 16));
 
-        JLabel val = new JLabel(value);
-        val.setFont(new Font("Arial", Font.PLAIN, 18));
+        valueLabel.setFont(new Font("Arial", Font.PLAIN, 18));
 
-        JPanel textPanel = new JPanel(new GridLayout(2, 2));
+        JPanel textPanel = new JPanel(new GridLayout(2, 1));
         textPanel.setBackground(Color.WHITE);
         textPanel.add(title);
-        textPanel.add(val);
+        textPanel.add(valueLabel);
 
         card.add(icon);
         card.add(textPanel);
 
         return card;
     }
-
 
     // Bar Chart
     static class RevenueChart extends JPanel {
@@ -135,10 +141,9 @@ public class RevenueView extends JPanel {
             int barWidth = (width - (2 * padding)) / data.size();
 
             g2.setColor(Color.GRAY);
-            g2.drawLine(padding, height - 80, width - padding, height - 80); // x-axis
-            g2.drawLine(padding, height - 80, padding, padding); // y-axis
+            g2.drawLine(padding, height - 80, width - padding, height - 80);
+            g2.drawLine(padding, height - 80, padding, padding);
 
-            // Bars
             int x = padding + 10;
             for (Map.Entry<String, Integer> entry : data.entrySet()) {
                 int value = entry.getValue();
@@ -148,12 +153,10 @@ public class RevenueView extends JPanel {
                 g2.setColor(Color.RED);
                 g2.fillRect(x, y, barWidth - 20, barHeight);
 
-                // Value
                 g2.setColor(Color.BLACK);
                 g2.setFont(new Font("Arial", Font.BOLD, 12));
                 g2.drawString("₱" + value, x + 5, y - 5);
 
-                // Month
                 g2.setFont(new Font("Arial", Font.PLAIN, 12));
                 g2.drawString(entry.getKey(), x + 10, height - 60);
 
