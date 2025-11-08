@@ -9,7 +9,7 @@ public class SidebarView extends JPanel {
 
     public SidebarView() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setPreferredSize(new Dimension(230, 700));
+        setPreferredSize(new Dimension(230, 650));
         setBackground(new Color(245, 245, 245));
 
         ImageIcon icon = new ImageIcon(getClass().getResource("/gopark/assets/gopark_logo.png"));
