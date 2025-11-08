@@ -1,12 +1,14 @@
 package gopark.controller;
 
 import gopark.dao.TransactionDAO;
+import gopark.dao.ParkingRateDAO;
 import gopark.model.DBConnection;
 
 import java.sql.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Map;
 
 public class VehicleEntryController {
 
@@ -95,14 +97,50 @@ public class VehicleEntryController {
         }
     }
 
-    public static double calculateFee(Timestamp entryTime) {
+    public static double calculateFee(Timestamp entryTime, String vehicleType) {
         if (entryTime == null) return 0.0;
+
+        // Get rates from database
+        Map<String, Double> rates = ParkingRateDAO.getParkingRates();
+
+        String vehicleKey = vehicleType.toLowerCase().contains("motor") ? "Motorcycle" : "Car";
+        double first3Hours = rates.getOrDefault(vehicleKey + "_first_3_hours", 0.0);
+        double succeedingHour = rates.getOrDefault(vehicleKey + "_succeeding_hour", 15.0);
+        double overnightRate = rates.getOrDefault(vehicleKey + "_overnight_rate", 0.0);
+
         LocalDateTime entry = entryTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         LocalDateTime now = LocalDateTime.now();
-        long minutes = Duration.between(entry, now).toMinutes();
-        long hours = Math.max(1, (minutes + 59) / 60);
-        double ratePerHour = 15.0;
-        return hours * ratePerHour;
+
+        long totalMinutes = Duration.between(entry, now).toMinutes();
+        long totalHours = Math.max(1, (totalMinutes + 59) / 60);
+
+        long days = totalHours / 24;
+        long remainingHours = totalHours % 24;
+
+        double fee = 0.0;
+
+        if (days > 0) {
+            // Overnight parking calculation
+            fee += days * overnightRate;
+
+            // Add remaining hours if any
+            if (remainingHours > 0) {
+                if (remainingHours <= 3) {
+                    fee += first3Hours;
+                } else {
+                    fee += first3Hours + ((remainingHours - 3) * succeedingHour);
+                }
+            }
+        } else {
+            // Regular parking calculation
+            if (totalHours <= 3) {
+                fee = first3Hours;
+            } else {
+                fee = first3Hours + ((totalHours - 3) * succeedingHour);
+            }
+        }
+
+        return Math.max(0, fee);
     }
 
     public static String getDurationText(Timestamp entryTime) {

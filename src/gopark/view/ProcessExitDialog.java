@@ -74,7 +74,7 @@ public class ProcessExitDialog extends JDialog {
         String formattedEntryTime = sdf.format(entryTime);
         JLabel entryLabel = new JLabel("Entry Time: " + formattedEntryTime);
 
-        double fee = VehicleEntryController.calculateFee(entryTime);
+        double fee = VehicleEntryController.calculateFee(entryTime, vType);
         JLabel durationLabel = new JLabel("Duration: " + VehicleEntryController.getDurationText(entryTime));
         JLabel totalLabel = new JLabel("Total Fee: ₱ " + String.format("%.2f", fee));
 
@@ -110,7 +110,7 @@ public class ProcessExitDialog extends JDialog {
         collect.addActionListener(e -> {
             boolean ok = VehicleEntryController.closeEntryAndFreeSlot(entryId, slotCode, fee);
             if (ok) {
-                dispose(); // close the exit dialog
+                dispose();
                 Timestamp exitTime = new Timestamp(System.currentTimeMillis());
                 new PaymentReceiptDialog(parent, plate, vType, slotCode, entryTime, exitTime, fee);
             }

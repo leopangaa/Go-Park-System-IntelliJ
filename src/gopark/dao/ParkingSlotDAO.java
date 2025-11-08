@@ -46,18 +46,4 @@ public class ParkingSlotDAO {
         }
         return list;
     }
-
-    public static boolean updateSlotStatus(String slotCode, String status) {
-        String sql = "UPDATE parking_slots SET status = ? WHERE slot_code = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, status);
-            stmt.setString(2, slotCode);
-            int rows = stmt.executeUpdate();
-            return rows > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 }
