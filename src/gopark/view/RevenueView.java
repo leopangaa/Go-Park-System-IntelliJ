@@ -12,8 +12,8 @@ public class RevenueView extends JPanel {
 
     private JLabel lblTodayRevenue;
     private JLabel lblMonthlyRevenue;
-
-    private RevenueController revenueController;   // ✅ instance controller
+    private RevenueController revenueController;
+    private Timer refreshTimer;
 
     public RevenueView() {
         setLayout(new BorderLayout());
@@ -21,7 +21,6 @@ public class RevenueView extends JPanel {
 
         revenueController = new RevenueController(DBConnection.getConnection());
 
-        // Header
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(Color.WHITE);
         headerPanel.setBorder(new EmptyBorder(20, 40, 10, 40));
@@ -41,7 +40,6 @@ public class RevenueView extends JPanel {
         headerPanel.add(titlePanel, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Stat Cards
         JPanel statsPanel = new JPanel(new GridLayout(1, 2, 20, 0));
         statsPanel.setBorder(new EmptyBorder(10, 40, 20, 40));
         statsPanel.setBackground(Color.WHITE);
@@ -50,13 +48,26 @@ public class RevenueView extends JPanel {
         lblMonthlyRevenue = new JLabel("₱0.00");
 
         statsPanel.add(createStatsCard("Today's Revenue", lblTodayRevenue));
-        statsPanel.add(createStatsCard("This Month’s Revenue", lblMonthlyRevenue));
+        statsPanel.add(createStatsCard("This Month's Revenue", lblMonthlyRevenue));
 
         add(statsPanel, BorderLayout.CENTER);
 
-        loadRevenueStats();
+        JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        refreshPanel.setBackground(Color.WHITE);
+        refreshPanel.setBorder(new EmptyBorder(0, 40, 10, 40));
 
-        // Chart Panel Container
+        JButton refreshButton = new JButton("Refresh Data");
+        refreshButton.setBackground(new Color(70, 130, 180));
+        refreshButton.setForeground(Color.WHITE);
+        refreshButton.setFocusPainted(false);
+        refreshButton.setFont(new Font("Arial", Font.BOLD, 12));
+        refreshButton.addActionListener(e -> refreshData());
+
+        refreshPanel.add(refreshButton);
+        add(refreshPanel, BorderLayout.SOUTH);
+
+        refreshData();
+
         JPanel chartContainer = new JPanel(new BorderLayout());
         chartContainer.setBorder(new EmptyBorder(10, 40, 40, 40));
         chartContainer.setBackground(Color.WHITE);
@@ -72,19 +83,80 @@ public class RevenueView extends JPanel {
         chartContainer.add(chartHeader, BorderLayout.NORTH);
 
         Map<String, Integer> monthlyRevenueData = revenueController.getMonthlyRevenue();
-
         RevenueChart chart = new RevenueChart(monthlyRevenueData);
         chartContainer.add(chart, BorderLayout.CENTER);
 
         add(chartContainer, BorderLayout.SOUTH);
+
+        startAutoRefresh();
     }
 
-    private void loadRevenueStats() {
-        double todaysRevenue = revenueController.getTodayRevenue();
-        double monthRevenue = revenueController.getMonthRevenue();
+    private void refreshData() {
+        try {
+            // Update stat cards
+            double todaysRevenue = revenueController.getTodayRevenue();
+            double monthRevenue = revenueController.getMonthRevenue();
 
-        lblTodayRevenue.setText("₱" + todaysRevenue);
-        lblMonthlyRevenue.setText("₱" + monthRevenue);
+            lblTodayRevenue.setText(String.format("₱%.2f", todaysRevenue));
+            lblMonthlyRevenue.setText(String.format("₱%.2f", monthRevenue));
+
+            Map<String, Integer> monthlyRevenueData = revenueController.getMonthlyRevenue();
+            refreshChart(monthlyRevenueData);
+
+            showRefreshFeedback();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Error refreshing revenue data: " + e.getMessage(),
+                    "Refresh Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void refreshChart(Map<String, Integer> newData) {
+        Component[] components = getComponents();
+        for (Component comp : components) {
+            if (comp instanceof JPanel) {
+                JPanel panel = (JPanel) comp;
+                Component[] subComps = panel.getComponents();
+                for (Component subComp : subComps) {
+                    if (subComp instanceof RevenueChart) {
+                        panel.remove(subComp);
+                        RevenueChart newChart = new RevenueChart(newData);
+                        panel.add(newChart, BorderLayout.CENTER);
+                        panel.revalidate();
+                        panel.repaint();
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private void showRefreshFeedback() {
+        lblTodayRevenue.setForeground(Color.BLUE);
+        lblMonthlyRevenue.setForeground(Color.BLUE);
+
+        Timer feedbackTimer = new Timer(500, e -> {
+            lblTodayRevenue.setForeground(Color.BLACK);
+            lblMonthlyRevenue.setForeground(Color.BLACK);
+        });
+        feedbackTimer.setRepeats(false);
+        feedbackTimer.start();
+    }
+
+    private void startAutoRefresh() {
+        refreshTimer = new Timer(30000, e -> {
+            refreshData();
+            System.out.println("Auto-refreshed revenue data at: " + new java.util.Date());
+        });
+        refreshTimer.start();
+    }
+
+    public void stopAutoRefresh() {
+        if (refreshTimer != null && refreshTimer.isRunning()) {
+            refreshTimer.stop();
+        }
     }
 
     private JPanel createStatsCard(String label, JLabel valueLabel) {
@@ -102,7 +174,8 @@ public class RevenueView extends JPanel {
         JLabel title = new JLabel(label);
         title.setFont(new Font("Arial", Font.BOLD, 16));
 
-        valueLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        valueLabel.setForeground(new Color(0, 100, 0));
 
         JPanel textPanel = new JPanel(new GridLayout(2, 1));
         textPanel.setBackground(Color.WHITE);
@@ -115,7 +188,6 @@ public class RevenueView extends JPanel {
         return card;
     }
 
-    // Bar Chart
     static class RevenueChart extends JPanel {
         private final Map<String, Integer> data;
 
@@ -137,35 +209,71 @@ public class RevenueView extends JPanel {
             int padding = 60;
             int maxBarHeight = height - 150;
 
+            if (data.isEmpty()) {
+                g2.setColor(Color.GRAY);
+                g2.setFont(new Font("Arial", Font.BOLD, 16));
+                String message = "No revenue data available";
+                FontMetrics fm = g2.getFontMetrics();
+                int messageWidth = fm.stringWidth(message);
+                g2.drawString(message, (width - messageWidth) / 2, height / 2);
+                return;
+            }
+
             int maxValue = data.values().stream().max(Integer::compareTo).orElse(1);
-            int barWidth = (width - (2 * padding)) / data.size();
+            int barWidth = Math.max(30, (width - (2 * padding)) / data.size());
 
             g2.setColor(Color.GRAY);
             g2.drawLine(padding, height - 80, width - padding, height - 80);
             g2.drawLine(padding, height - 80, padding, padding);
 
+            g2.setFont(new Font("Arial", Font.PLAIN, 11));
+            int ySteps = 5;
+            for (int i = 0; i <= ySteps; i++) {
+                int y = height - 80 - (i * maxBarHeight / ySteps);
+                int value = (i * maxValue / ySteps);
+                String label = "₱" + value;
+                FontMetrics fm = g2.getFontMetrics();
+                int labelWidth = fm.stringWidth(label);
+                g2.drawString(label, padding - labelWidth - 5, y + 4);
+                g2.drawLine(padding - 3, y, padding, y);
+            }
+
             int x = padding + 10;
+            int barSpacing = 10;
+
             for (Map.Entry<String, Integer> entry : data.entrySet()) {
                 int value = entry.getValue();
                 int barHeight = (int) ((value / (double) maxValue) * maxBarHeight);
                 int y = height - 80 - barHeight;
 
                 g2.setColor(Color.RED);
-                g2.fillRect(x, y, barWidth - 20, barHeight);
+                g2.fillRect(x, y, barWidth - barSpacing, barHeight);
 
                 g2.setColor(Color.BLACK);
-                g2.setFont(new Font("Arial", Font.BOLD, 12));
-                g2.drawString("₱" + value, x + 5, y - 5);
+                g2.setFont(new Font("Arial", Font.BOLD, 11));
+                String valueText = "₱" + value;
+                FontMetrics fm = g2.getFontMetrics();
+                int textWidth = fm.stringWidth(valueText);
+                g2.drawString(valueText, x + (barWidth - barSpacing - textWidth) / 2, y - 5);
 
                 g2.setFont(new Font("Arial", Font.PLAIN, 12));
-                g2.drawString(entry.getKey(), x + 10, height - 60);
+                g2.drawString(entry.getKey(), x + (barWidth - barSpacing) / 2 - 10, height - 60);
 
                 x += barWidth;
             }
 
-            g2.setFont(new Font("Arial", Font.PLAIN, 13));
+            g2.setFont(new Font("Arial", Font.BOLD, 13));
             g2.drawString("Month", width / 2 - 20, height - 30);
-            g2.drawString("Revenue (₱)", 10, padding - 10);
+
+            g2.rotate(-Math.PI / 2);
+            g2.drawString("Revenue (₱)", -height / 2 - 30, padding - 30);
+            g2.rotate(Math.PI / 2);
         }
+    }
+
+    @Override
+    public void removeNotify() {
+        super.removeNotify();
+        stopAutoRefresh();
     }
 }
