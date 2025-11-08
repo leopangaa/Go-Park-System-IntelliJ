@@ -46,7 +46,6 @@ public class MainDashboardView extends JFrame {
 
         add(mainPanel, BorderLayout.CENTER);
 
-        // Default panel
         cardLayout.show(mainPanel, "Dashboard");
     }
 
@@ -56,18 +55,15 @@ public class MainDashboardView extends JFrame {
         topBarPanel.setPreferredSize(new Dimension(getWidth(), 30));
         topBarPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(200, 200, 200)));
 
-        // Title label - left side
         JLabel titleLabel = new JLabel("  GoPark - Admin Portal");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 12));
         titleLabel.setForeground(new Color(80, 80, 80));
         topBarPanel.add(titleLabel, BorderLayout.WEST);
 
-        // Window control buttons panel - right side
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         controlPanel.setBackground(Color.WHITE);
         controlPanel.setPreferredSize(new Dimension(70, 30));
 
-        // Minimize button - same style as LoginView
         JButton minimizeButton = new JButton("−");
         minimizeButton.setPreferredSize(new Dimension(30, 25));
         minimizeButton.setBackground(Color.WHITE);
@@ -87,7 +83,6 @@ public class MainDashboardView extends JFrame {
             }
         });
 
-        // Exit button - same style as LoginView
         JButton exitButton = new JButton("×");
         exitButton.setPreferredSize(new Dimension(30, 25));
         exitButton.setBackground(Color.WHITE);
