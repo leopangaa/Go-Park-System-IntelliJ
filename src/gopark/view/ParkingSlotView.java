@@ -16,146 +16,289 @@ public class ParkingSlotView extends JPanel {
 
     public ParkingSlotView(List<ParkingSlot> slots) {
         setLayout(new BorderLayout());
-        setBackground(Color.WHITE);
+        setBackground(new Color(240, 242, 245));
         setBorder(new EmptyBorder(20, 30, 20, 30));
 
-        // header
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(Color.WHITE);
+        // Header Section
+        JPanel headerPanel = createHeaderPanel();
+        add(headerPanel, BorderLayout.NORTH);
 
-        JPanel left = new JPanel();
-        left.setBackground(Color.WHITE);
-        left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
-        JLabel title = new JLabel("Parking Slot Management");
-        title.setFont(new Font("Arial", Font.BOLD, 22));
-        JLabel subtitle = new JLabel("Monitor and manage parking operations");
-        subtitle.setForeground(Color.GRAY);
-        left.add(title);
-        left.add(subtitle);
-        header.add(left, BorderLayout.WEST);
+        // Main Content Section
+        JPanel mainContent = new JPanel(new BorderLayout());
+        mainContent.setBackground(new Color(240, 242, 245));
 
-        newEntryButton = new JButton("+ New Entry");
-        newEntryButton.setBackground(new Color(220, 53, 69));
-        newEntryButton.setForeground(Color.WHITE);
-        newEntryButton.setFocusPainted(false);
-        header.add(newEntryButton, BorderLayout.EAST);
+        // Stats Cards Section
+        JPanel statsPanel = createStatsPanel();
+        mainContent.add(statsPanel, BorderLayout.NORTH);
 
-        add(header, BorderLayout.NORTH);
+        // Instruction Panel
+        JPanel instructionPanel = createInstructionPanel();
+        mainContent.add(instructionPanel, BorderLayout.CENTER);
 
-        // stats
-        JPanel center = new JPanel();
-        center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
-        center.setBackground(Color.WHITE);
+        // Parking Status Section
+        JPanel parkingStatusPanel = createParkingStatusPanel();
+        mainContent.add(parkingStatusPanel, BorderLayout.SOUTH);
 
-        JPanel statPanel = new JPanel(new GridLayout(1, 3, 20, 0));
-        statPanel.setBackground(Color.WHITE);
-        statPanel.setBorder(new EmptyBorder(10, 0, 20, 0));
-
-        availableLabel = new JLabel("0 Slots");
-        occupiedLabel = new JLabel("0 Slots");
-        totalLabel = new JLabel("0 Slots");
-
-        statPanel.add(createStatCard("Available", availableLabel));
-        statPanel.add(createStatCard("Occupied", occupiedLabel));
-        statPanel.add(createStatCard("Total Capacity", totalLabel));
-
-        center.add(statPanel);
-
-        // instruction
-        JPanel info = new JPanel(new BorderLayout());
-        info.setBackground(new Color(255, 240, 240));
-        info.setBorder(BorderFactory.createCompoundBorder(new LineBorder(new Color(220, 53, 69), 1),
-                new EmptyBorder(10, 10, 10, 10)));
-        JLabel instr = new JLabel("<html>Click a yellow/red slot to process exit/payment.<br/>Use New Entry to assign an available slot.</html>");
-        instr.setForeground(new Color(100, 0, 0));
-        info.add(instr, BorderLayout.CENTER);
-        center.add(info);
-        center.add(Box.createRigidArea(new Dimension(0, 16)));
-
-        // car section
-        JPanel carSection = new JPanel(new BorderLayout());
-        carSection.setBackground(Color.WHITE);
-        JLabel carTitle = new JLabel("Car Parking Status");
-        carTitle.setFont(new Font("Arial", Font.BOLD, 16));
-        carSection.add(carTitle, BorderLayout.NORTH);
-        carContainer = new JPanel();
-        carContainer.setBorder(BorderFactory.createCompoundBorder(new LineBorder(new Color(220, 220, 220)), new EmptyBorder(10, 10, 10, 10)));
-        carSection.add(new JScrollPane(carContainer), BorderLayout.CENTER);
-        center.add(carSection);
-        center.add(Box.createRigidArea(new Dimension(0, 25)));
-
-        // motorcycle section
-        JPanel motoSection = new JPanel(new BorderLayout());
-        motoSection.setBackground(Color.WHITE);
-        JLabel motoTitle = new JLabel("Motorcycle Parking Status");
-        motoTitle.setFont(new Font("Arial", Font.BOLD, 16));
-        motoSection.add(motoTitle, BorderLayout.NORTH);
-        motoContainer = new JPanel();
-        motoContainer.setBorder(BorderFactory.createCompoundBorder(new LineBorder(new Color(220, 220, 220)), new EmptyBorder(10, 10, 10, 10)));
-        motoSection.add(new JScrollPane(motoContainer), BorderLayout.CENTER);
-        center.add(motoSection);
-
-        add(center, BorderLayout.CENTER);
+        add(mainContent, BorderLayout.CENTER);
 
         updateSlots(slots);
     }
 
-    public void setRefreshCallback(Runnable r) {
-        refreshCallback = r;
+    private JPanel createHeaderPanel() {
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(new Color(240, 242, 245));
+        headerPanel.setBorder(new EmptyBorder(0, 0, 30, 0));
+
+        // Left side - GOPARK and ParkingMaster
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setBackground(new Color(240, 242, 245));
+
+        JLabel goparkTitle = new JLabel("GOPARK");
+        goparkTitle.setFont(new Font("Arial", Font.BOLD, 24));
+        goparkTitle.setForeground(new Color(44, 62, 80));
+
+        JLabel mainTitle = new JLabel("ParkingMaster");
+        mainTitle.setFont(new Font("Arial", Font.BOLD, 28));
+        mainTitle.setForeground(new Color(44, 62, 80));
+
+        JLabel subtitle = new JLabel("Admin Portal");
+        subtitle.setFont(new Font("Arial", Font.PLAIN, 16));
+        subtitle.setForeground(new Color(127, 140, 141));
+
+        titlePanel.add(goparkTitle);
+        titlePanel.add(Box.createVerticalStrut(5));
+        titlePanel.add(mainTitle);
+        titlePanel.add(Box.createVerticalStrut(5));
+        titlePanel.add(subtitle);
+
+        JPanel rightPanel = new JPanel(new BorderLayout());
+        rightPanel.setBackground(new Color(240, 242, 245));
+
+        JLabel managementTitle = new JLabel("Parking Slot Management");
+        managementTitle.setFont(new Font("Arial", Font.BOLD, 20));
+        managementTitle.setForeground(new Color(52, 73, 94));
+        managementTitle.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        newEntryButton = new JButton("+ New Entry");
+        newEntryButton.setFont(new Font("Arial", Font.BOLD, 14));
+        newEntryButton.setBackground(new Color(220, 53, 69));
+        newEntryButton.setForeground(Color.WHITE);
+        newEntryButton.setFocusPainted(false);
+        newEntryButton.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        newEntryButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(new Color(240, 242, 245));
+        buttonPanel.add(newEntryButton);
+
+        rightPanel.add(managementTitle, BorderLayout.NORTH);
+        rightPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+        headerPanel.add(rightPanel, BorderLayout.EAST);
+
+        return headerPanel;
+    }
+
+    private JPanel createStatsPanel() {
+        JPanel statsPanel = new JPanel(new GridLayout(1, 3, 20, 0));
+        statsPanel.setBackground(new Color(240, 242, 245));
+        statsPanel.setBorder(new EmptyBorder(0, 0, 30, 0));
+
+        availableLabel = new JLabel("33 Slots", SwingConstants.CENTER);
+        occupiedLabel = new JLabel("2 Slots", SwingConstants.CENTER);
+        totalLabel = new JLabel("35 Slots", SwingConstants.CENTER);
+
+        statsPanel.add(createStatCard("Available", availableLabel));
+        statsPanel.add(createStatCard("Occupied", occupiedLabel));
+        statsPanel.add(createStatCard("Total Capacity", totalLabel));
+
+        return statsPanel;
     }
 
     private JPanel createStatCard(String title, JLabel valueLabel) {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        JPanel card = new JPanel(new BorderLayout());
         card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(new LineBorder(new Color(230, 230, 230), 1, true), new EmptyBorder(15, 15, 15, 15)));
-        JLabel t = new JLabel(title);
-        t.setForeground(Color.GRAY);
-        valueLabel.setFont(new Font("Arial", Font.BOLD, 22));
-        card.add(t);
-        card.add(Box.createVerticalStrut(8));
-        card.add(valueLabel);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(220, 220, 220), 1),
+                new EmptyBorder(25, 20, 25, 20)
+        ));
+
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBackground(Color.WHITE);
+
+        // Title
+        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setForeground(new Color(100, 100, 100));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Value
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        valueLabel.setForeground(new Color(60, 60, 60));
+        valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        contentPanel.add(titleLabel);
+        contentPanel.add(Box.createVerticalStrut(15));
+        contentPanel.add(valueLabel);
+
+        card.add(contentPanel, BorderLayout.CENTER);
         return card;
+    }
+
+    private JPanel createInstructionPanel() {
+        JPanel instructionPanel = new JPanel(new BorderLayout());
+        instructionPanel.setBackground(new Color(240, 242, 245));
+        instructionPanel.setBorder(new EmptyBorder(0, 0, 15, 0));
+
+        JPanel instructionCard = new JPanel(new BorderLayout());
+        instructionCard.setBackground(new Color(255, 148, 148));
+        instructionCard.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(255, 0, 0), 1),
+                new EmptyBorder(8, 15, 8, 15)
+        ));
+
+        JLabel instructionText = new JLabel("Click RED slots for exits • Use \"New Entry\" for new vehicles");
+        instructionText.setFont(new Font("Arial", Font.BOLD, 11));
+        instructionText.setForeground(new Color(0, 0, 0));
+        instructionText.setHorizontalAlignment(SwingConstants.CENTER);
+
+        instructionCard.add(instructionText, BorderLayout.CENTER);
+        instructionPanel.add(instructionCard, BorderLayout.CENTER);
+
+        return instructionPanel;
+    }
+
+    private JPanel createParkingStatusPanel() {
+        JPanel parkingPanel = new JPanel(new BorderLayout());
+        parkingPanel.setBackground(new Color(240, 242, 245));
+
+        // Main parking content panel
+        JPanel parkingContent = new JPanel(new BorderLayout());
+        parkingContent.setBackground(Color.WHITE);
+        parkingContent.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(220, 220, 220), 1),
+                new EmptyBorder(25, 25, 25, 25)
+        ));
+
+        // Parking slot containers
+        JPanel parkingGridPanel = createParkingSlotContainers();
+        parkingContent.add(parkingGridPanel, BorderLayout.CENTER);
+
+        parkingPanel.add(parkingContent, BorderLayout.CENTER);
+
+        return parkingPanel;
+    }
+
+    private JPanel createParkingSlotContainers() {
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(Color.WHITE);
+
+        // Car Parking Section
+        JPanel carSection = new JPanel(new BorderLayout());
+        carSection.setBackground(Color.WHITE);
+        carSection.setBorder(new EmptyBorder(0, 0, 25, 0));
+
+        JLabel carTitle = new JLabel("Car Parking Status");
+        carTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        carTitle.setBorder(new EmptyBorder(0, 0, 15, 0));
+        carSection.add(carTitle, BorderLayout.NORTH);
+
+        carContainer = new JPanel();
+        carContainer.setLayout(new GridLayout(2, 9, 10, 10));
+        carContainer.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(220, 220, 220)),
+                new EmptyBorder(15, 15, 15, 15)
+        ));
+        carContainer.setBackground(Color.WHITE);
+        carSection.add(carContainer, BorderLayout.CENTER);
+
+        // Motorcycle Parking Section
+        JPanel motoSection = new JPanel(new BorderLayout());
+        motoSection.setBackground(Color.WHITE);
+
+        JLabel motoTitle = new JLabel("Motorcycle Parking Status");
+        motoTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        motoTitle.setBorder(new EmptyBorder(0, 0, 15, 0));
+        motoSection.add(motoTitle, BorderLayout.NORTH);
+
+        motoContainer = new JPanel();
+        motoContainer.setLayout(new GridLayout(1, 17, 10, 10));
+        motoContainer.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(220, 220, 220)),
+                new EmptyBorder(15, 15, 15, 15)
+        ));
+        motoContainer.setBackground(Color.WHITE);
+        motoSection.add(motoContainer, BorderLayout.CENTER);
+
+        mainPanel.add(carSection);
+        mainPanel.add(motoSection);
+
+        return mainPanel;
     }
 
     private void buildGrid(JPanel container, String type, List<ParkingSlot> slots) {
         container.removeAll();
-        container.setLayout(type.equalsIgnoreCase("Car") ? new GridLayout(2, 9, 10, 10) : new GridLayout(1, 17, 10, 10));
 
-        // Sort slots by numeric part of ID (e.g., C1 < C2 < C10)
-        slots.stream()
+        if (type.equalsIgnoreCase("Car")) {
+            container.setLayout(new GridLayout(2, 9, 10, 10));
+        } else {
+            container.setLayout(new GridLayout(1, 17, 10, 10));
+        }
+
+        List<ParkingSlot> filteredSlots = slots.stream()
                 .filter(s -> s.getType().equalsIgnoreCase(type))
                 .sorted((a, b) -> {
-                    String numA = a.getId().replaceAll("\\D+", ""); // remove letters
+                    String numA = a.getId().replaceAll("\\D+", "");
                     String numB = b.getId().replaceAll("\\D+", "");
                     int nA = numA.isEmpty() ? 0 : Integer.parseInt(numA);
                     int nB = numB.isEmpty() ? 0 : Integer.parseInt(numB);
                     return Integer.compare(nA, nB);
                 })
-                .forEach(slot -> {
-                    JButton btn = new JButton(slot.getId());
-                    btn.setPreferredSize(new Dimension(60, 80));
-                    btn.setFocusPainted(false);
-                    btn.setFont(new Font("Arial", Font.BOLD, 13));
-                    btn.setForeground(Color.WHITE);
-                    btn.setBackground(slot.getColor());
-                    btn.setBorder(new LineBorder(slot.getColor().darker(), 2, true));
+                .toList();
 
-                    btn.addActionListener(e -> {
-                        if (!"AVAILABLE".equalsIgnoreCase(slot.getStatus())) {
-                            JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-                            new ProcessExitDialog(parent, slot.getId());
-                            if (refreshCallback != null) refreshCallback.run();
-                        } else {
-                            JOptionPane.showMessageDialog(this, slot.getId() + " is available.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                        }
-                    });
+        for (ParkingSlot slot : filteredSlots) {
+            JButton btn = createSlotButton(slot);
+            container.add(btn);
+        }
 
-                    container.add(btn);
-                });
+        int totalSlotsNeeded = type.equalsIgnoreCase("Car") ? 18 : 17;
+        int emptySlots = totalSlotsNeeded - filteredSlots.size();
+        for (int i = 0; i < emptySlots; i++) {
+            JPanel emptyPanel = new JPanel();
+            emptyPanel.setBackground(Color.WHITE);
+            emptyPanel.setPreferredSize(new Dimension(60, 80));
+            container.add(emptyPanel);
+        }
 
         container.revalidate();
         container.repaint();
+    }
+
+    private JButton createSlotButton(ParkingSlot slot) {
+        JButton btn = new JButton(slot.getId());
+        btn.setPreferredSize(new Dimension(60, 80));
+        btn.setFocusPainted(false);
+        btn.setFont(new Font("Arial", Font.BOLD, 13));
+        btn.setForeground(Color.WHITE);
+        btn.setBackground(slot.getColor());
+        btn.setBorder(new LineBorder(slot.getColor().darker(), 2, true));
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        btn.addActionListener(e -> {
+            if (!"AVAILABLE".equalsIgnoreCase(slot.getStatus())) {
+                JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+                new ProcessExitDialog(parent, slot.getId());
+                if (refreshCallback != null) refreshCallback.run();
+            } else {
+                JOptionPane.showMessageDialog(this, slot.getId() + " is available.", "Info", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        return btn;
     }
 
     public void updateSlots(List<ParkingSlot> slots) {
@@ -171,7 +314,10 @@ public class ParkingSlotView extends JPanel {
         buildGrid(motoContainer, "Motorcycle", slots);
     }
 
-    // getters
+    public void setRefreshCallback(Runnable r) {
+        refreshCallback = r;
+    }
+
     public JButton getNewEntryButton() {
         return newEntryButton;
     }
