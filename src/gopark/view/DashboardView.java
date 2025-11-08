@@ -2,7 +2,6 @@ package gopark.view;
 
 import gopark.controller.RevenueController;
 import gopark.dao.ParkingSlotDAO;
-import gopark.dao.TransactionDAO;
 import gopark.model.DBConnection;
 import gopark.model.ParkingSlot;
 
@@ -17,119 +16,161 @@ public class DashboardView extends JPanel {
     private JLabel availableSlotsLabel;
     private JLabel todaysRevenueLabel;
     private JLabel totalRevenueLabel;
-    private JLabel occupancyDescriptionLabel; // Added to track the description label
+    private JLabel occupancyDescriptionLabel;
     private RevenueController revenueController;
     private JPanel carContainer, motoContainer;
     private Timer refreshTimer;
 
     public DashboardView() {
         setLayout(new BorderLayout());
-        setBackground(Color.WHITE);
+        setBackground(new Color(240, 242, 245));
 
         revenueController = new RevenueController(DBConnection.getConnection());
 
-        // Header
-        JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        headerPanel.setBackground(Color.WHITE);
-        headerPanel.setBorder(new EmptyBorder(20, 40, 10, 40));
+        JPanel mainContent = new JPanel(new BorderLayout());
+        mainContent.setBackground(new Color(240, 242, 245));
+        mainContent.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel title = new JLabel("Dashboard Overview");
-        title.setFont(new Font("Arial", Font.BOLD, 22));
-        headerPanel.add(title);
+        JPanel headerPanel = createHeaderPanel();
+        mainContent.add(headerPanel, BorderLayout.NORTH);
 
-        JLabel subtitle = new JLabel("Real-time parking facility monitoring and analytics");
-        subtitle.setFont(new Font("Arial", Font.PLAIN, 14));
-        subtitle.setForeground(Color.GRAY);
-        headerPanel.add(subtitle);
+        JPanel statsPanel = createStatsCardsPanel();
+        mainContent.add(statsPanel, BorderLayout.CENTER);
 
-        add(headerPanel, BorderLayout.NORTH);
+        JPanel parkingStatusPanel = createParkingStatusPanel();
+        mainContent.add(parkingStatusPanel, BorderLayout.SOUTH);
 
-        // Content
-        JPanel content = new JPanel();
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBackground(new Color(245, 245, 245));
-        content.setBorder(new EmptyBorder(10, 40, 20, 40));
+        add(mainContent, BorderLayout.CENTER);
 
-        JPanel topCardsPanel = new JPanel(new GridLayout(1, 4, 20, 0));
-        topCardsPanel.setOpaque(false);
-        topCardsPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
+        refreshDashboardData();
+        startAutoRefresh();
+    }
+
+    private JPanel createHeaderPanel() {
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(new Color(240, 242, 245));
+        headerPanel.setBorder(new EmptyBorder(0, 0, 30, 0));
+
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setBackground(new Color(240, 242, 245));
+
+        JLabel mainTitle = new JLabel("ParkingMaster");
+        mainTitle.setFont(new Font("Arial", Font.BOLD, 28));
+        mainTitle.setForeground(new Color(44, 62, 80));
+
+        JLabel subtitle = new JLabel("Admin Portal");
+        subtitle.setFont(new Font("Arial", Font.PLAIN, 16));
+        subtitle.setForeground(new Color(127, 140, 141));
+
+        titlePanel.add(mainTitle);
+        titlePanel.add(Box.createVerticalStrut(5));
+        titlePanel.add(subtitle);
+
+        JLabel dashboardTitle = new JLabel("Dashboard Overview");
+        dashboardTitle.setFont(new Font("Arial", Font.BOLD, 20));
+        dashboardTitle.setForeground(new Color(52, 73, 94));
+        dashboardTitle.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+        headerPanel.add(dashboardTitle, BorderLayout.EAST);
+
+        return headerPanel;
+    }
+
+    private JPanel createStatsCardsPanel() {
+        JPanel statsPanel = new JPanel(new GridLayout(1, 4, 20, 0));
+        statsPanel.setBackground(new Color(240, 242, 245));
+        statsPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 
         occupancyRateLabel = new JLabel("0%", SwingConstants.CENTER);
         availableSlotsLabel = new JLabel("0 Slots", SwingConstants.CENTER);
         todaysRevenueLabel = new JLabel("₱0.00", SwingConstants.CENTER);
         totalRevenueLabel = new JLabel("₱0.00", SwingConstants.CENTER);
-        occupancyDescriptionLabel = new JLabel("0/0 slots occupied"); // Initialize description label
+        occupancyDescriptionLabel = new JLabel("0/35 slots occupied", SwingConstants.CENTER);
 
-        topCardsPanel.add(createStatsCard("Occupancy Rate", occupancyRateLabel, occupancyDescriptionLabel));
-        topCardsPanel.add(createStatsCard("Available Slots", availableSlotsLabel, "Remaining"));
-        topCardsPanel.add(createStatsCard("Today's Revenue", todaysRevenueLabel, "As of now"));
-        topCardsPanel.add(createStatsCard("Total Revenue", totalRevenueLabel, "This Month"));
+        statsPanel.add(createDesignStatsCard("Occupancy Rate", occupancyRateLabel, occupancyDescriptionLabel));
+        statsPanel.add(createDesignStatsCard("Available Slots", availableSlotsLabel, "Remaining"));
+        statsPanel.add(createDesignStatsCard("Today's Revenue", todaysRevenueLabel, "As of now"));
+        statsPanel.add(createDesignStatsCard("Total Revenue", totalRevenueLabel, "This Month"));
 
-        content.add(topCardsPanel);
-
-        // Parking Status Section
-        JPanel statusPanel = new JPanel(new BorderLayout());
-        statusPanel.setBackground(Color.WHITE);
-        statusPanel.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(220, 220, 220), 1, true),
-                new EmptyBorder(20, 20, 20, 20)
-        ));
-
-        JLabel statusTitle = new JLabel("Parking Lot Status");
-        statusTitle.setFont(new Font("Arial", Font.BOLD, 18));
-        statusPanel.add(statusTitle, BorderLayout.NORTH);
-
-        JPanel parkingGridPanel = createParkingSlotContainers();
-        statusPanel.add(parkingGridPanel, BorderLayout.CENTER);
-
-        content.add(statusPanel);
-
-        add(content, BorderLayout.CENTER);
-
-        refreshDashboardData();
-
-        startAutoRefresh();
+        return statsPanel;
     }
 
-    private JPanel createStatsCard(String title, JLabel valueLabel, JLabel descriptionLabel) {
-        JPanel card = new JPanel();
-        card.setLayout(new BorderLayout(10, 0));
+    private JPanel createDesignStatsCard(String title, JLabel valueLabel, JLabel descriptionLabel) {
+        JPanel card = new JPanel(new BorderLayout());
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(230, 230, 230), 1, true),
-                new EmptyBorder(20, 20, 20, 20)
+                new LineBorder(new Color(220, 220, 220), 1),
+                new EmptyBorder(25, 20, 25, 20)
         ));
 
-        // Stats Card Content
-        JPanel textPanel = new JPanel();
-        textPanel.setBackground(Color.WHITE);
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBackground(Color.WHITE);
 
-        JLabel lblTitle = new JLabel(title);
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 14));
-        lblTitle.setForeground(new Color(80, 80, 80));
+        // Title - properly centered
+        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setForeground(new Color(100, 100, 100));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        valueLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        valueLabel.setForeground(new Color(33, 33, 33));
+        // Value - properly centered
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        valueLabel.setForeground(new Color(60, 60, 60));
+        valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        valueLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        descriptionLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        descriptionLabel.setForeground(Color.GRAY);
+        // Description - properly centered
+        descriptionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        descriptionLabel.setForeground(new Color(150, 150, 150));
+        descriptionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        descriptionLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        textPanel.add(lblTitle);
-        textPanel.add(Box.createVerticalStrut(8));
-        textPanel.add(valueLabel);
-        textPanel.add(Box.createVerticalStrut(4));
-        textPanel.add(descriptionLabel);
+        // Add components with balanced vertical spacing
+        contentPanel.add(titleLabel);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 12))); // Consistent spacing
+        contentPanel.add(valueLabel);
+        contentPanel.add(Box.createRigidArea(new Dimension(0, 8))); // Consistent spacing
+        contentPanel.add(descriptionLabel);
 
-        card.add(textPanel, BorderLayout.CENTER);
+        // Center the entire content panel within the card
+        JPanel centerWrapper = new JPanel(new GridBagLayout());
+        centerWrapper.setBackground(Color.WHITE);
+        centerWrapper.add(contentPanel);
 
+        card.add(centerWrapper, BorderLayout.CENTER);
         return card;
     }
 
-    private JPanel createStatsCard(String title, JLabel valueLabel, String description) {
-        JLabel descLabel = new JLabel(description);
-        return createStatsCard(title, valueLabel, descLabel);
+    private JPanel createDesignStatsCard(String title, JLabel valueLabel, String description) {
+        JLabel descLabel = new JLabel(description, SwingConstants.CENTER);
+        return createDesignStatsCard(title, valueLabel, descLabel);
+    }
+
+    private JPanel createParkingStatusPanel() {
+        JPanel parkingPanel = new JPanel(new BorderLayout());
+        parkingPanel.setBackground(new Color(240, 242, 245));
+
+        JLabel parkingTitle = new JLabel("Parking Lot Status");
+        parkingTitle.setFont(new Font("Arial", Font.BOLD, 22));
+        parkingTitle.setForeground(new Color(44, 62, 80));
+        parkingTitle.setBorder(new EmptyBorder(20, 0, 20, 0));
+
+        JPanel parkingContent = new JPanel(new BorderLayout());
+        parkingContent.setBackground(Color.WHITE);
+        parkingContent.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(220, 220, 220), 1),
+                new EmptyBorder(25, 25, 25, 25)
+        ));
+
+        JPanel parkingGridPanel = createParkingSlotContainers();
+        parkingContent.add(parkingGridPanel, BorderLayout.CENTER);
+
+        parkingPanel.add(parkingTitle, BorderLayout.NORTH);
+        parkingPanel.add(parkingContent, BorderLayout.CENTER);
+
+        return parkingPanel;
     }
 
     private JPanel createParkingSlotContainers() {
@@ -137,35 +178,59 @@ public class DashboardView extends JPanel {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBackground(Color.WHITE);
 
+        // Car Parking Section
         JPanel carSection = new JPanel(new BorderLayout());
         carSection.setBackground(Color.WHITE);
-        carSection.setBorder(new EmptyBorder(0, 0, 25, 0));
+        carSection.setBorder(new EmptyBorder(0, 0, 30, 0));
 
         JLabel carTitle = new JLabel("Car Parking");
         carTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        carTitle.setBorder(new EmptyBorder(0, 0, 10, 0));
         carSection.add(carTitle, BorderLayout.NORTH);
 
         carContainer = new JPanel();
+        carContainer.setLayout(new GridLayout(2, 9, 8, 8));
         carContainer.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(220, 220, 220)),
-                new EmptyBorder(10, 10, 10, 10)
+                new EmptyBorder(15, 15, 15, 15)
         ));
         carContainer.setBackground(Color.WHITE);
+
+        for (int i = 1; i <= 18; i++) {
+            JPanel placeholder = new JPanel();
+            placeholder.setBackground(new Color(240, 240, 240));
+            placeholder.setBorder(new LineBorder(new Color(200, 200, 200)));
+            placeholder.setPreferredSize(new Dimension(70, 60));
+            carContainer.add(placeholder);
+        }
+
         carSection.add(carContainer, BorderLayout.CENTER);
 
+        // Motorcycle Parking Section
         JPanel motoSection = new JPanel(new BorderLayout());
         motoSection.setBackground(Color.WHITE);
 
         JLabel motoTitle = new JLabel("Motorcycle Parking");
         motoTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        motoTitle.setBorder(new EmptyBorder(0, 0, 10, 0));
         motoSection.add(motoTitle, BorderLayout.NORTH);
 
         motoContainer = new JPanel();
+        motoContainer.setLayout(new GridLayout(1, 8, 8, 8));
         motoContainer.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(220, 220, 220)),
-                new EmptyBorder(10, 10, 10, 10)
+                new EmptyBorder(15, 15, 15, 15)
         ));
         motoContainer.setBackground(Color.WHITE);
+
+        for (int i = 1; i <= 17; i++) {
+            JPanel placeholder = new JPanel();
+            placeholder.setBackground(new Color(240, 240, 240));
+            placeholder.setBorder(new LineBorder(new Color(200, 200, 200)));
+            placeholder.setPreferredSize(new Dimension(70, 60));
+            motoContainer.add(placeholder);
+        }
+
         motoSection.add(motoContainer, BorderLayout.CENTER);
 
         mainPanel.add(carSection);
@@ -178,9 +243,9 @@ public class DashboardView extends JPanel {
         container.removeAll();
 
         if (type.equalsIgnoreCase("Car")) {
-            container.setLayout(new GridLayout(2, 9, 10, 10));
+            container.setLayout(new GridLayout(2, 9, 8, 8));
         } else {
-            container.setLayout(new GridLayout(1, 9, 10, 10));
+            container.setLayout(new GridLayout(1, 8, 8, 8));
         }
 
         List<ParkingSlot> filteredSlots = slots.stream()
@@ -199,12 +264,18 @@ public class DashboardView extends JPanel {
             container.add(btn);
         }
 
-        int totalSlotsNeeded = type.equalsIgnoreCase("Car") ? 18 : 18;
+        int totalSlotsNeeded;
+        if (type.equalsIgnoreCase("Car")) {
+            totalSlotsNeeded = 18;
+        } else {
+            totalSlotsNeeded = 17;
+        }
+
         int emptySlots = totalSlotsNeeded - filteredSlots.size();
         for (int i = 0; i < emptySlots; i++) {
             JPanel emptyPanel = new JPanel();
             emptyPanel.setBackground(Color.WHITE);
-            emptyPanel.setPreferredSize(new Dimension(60, 80));
+            emptyPanel.setBorder(null);
             container.add(emptyPanel);
         }
 
@@ -213,14 +284,16 @@ public class DashboardView extends JPanel {
     }
 
     private JButton createSlotButton(ParkingSlot slot) {
-        JButton btn = new JButton(slot.getId());
-        btn.setPreferredSize(new Dimension(60, 80));
+        JButton btn = new JButton("<html><center>" + slot.getId() + "</center></html>");
+        btn.setPreferredSize(new Dimension(70, 60)); // Better proportions
+        btn.setMinimumSize(new Dimension(70, 60));
+        btn.setMaximumSize(new Dimension(70, 60));
         btn.setFocusPainted(false);
-        btn.setFont(new Font("Arial", Font.BOLD, 13));
+        btn.setFont(new Font("Arial", Font.BOLD, 12));
         btn.setForeground(Color.WHITE);
         btn.setBackground(slot.getColor());
         btn.setBorder(new LineBorder(slot.getColor().darker(), 2, true));
-        btn.setEnabled(false); // Read-only in dashboard
+        btn.setEnabled(false);
 
         btn.setToolTipText(slot.getId() + " - " + slot.getStatus());
 
@@ -242,8 +315,8 @@ public class DashboardView extends JPanel {
 
             occupancyRateLabel.setText(String.format("%.2f%%", occupancyRate));
             availableSlotsLabel.setText(availableSlots + " Slots");
-            todaysRevenueLabel.setText(String.format("₱%.2f", todayRevenue));
-            totalRevenueLabel.setText(String.format("₱%.2f", monthRevenue));
+            todaysRevenueLabel.setText(String.format("₱%,.2f", todayRevenue));
+            totalRevenueLabel.setText(String.format("₱%,.2f", monthRevenue));
 
             occupancyDescriptionLabel.setText(occupiedSlots + "/" + totalSlots + " slots occupied");
 
@@ -257,9 +330,8 @@ public class DashboardView extends JPanel {
     }
 
     private void startAutoRefresh() {
-        refreshTimer = new Timer(5000, e -> { // Refresh every 5 seconds
+        refreshTimer = new Timer(5000, e -> {
             refreshDashboardData();
-            System.out.println("Auto-refreshed dashboard data at: " + new java.util.Date());
         });
         refreshTimer.start();
     }
