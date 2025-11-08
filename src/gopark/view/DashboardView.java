@@ -51,7 +51,6 @@ public class DashboardView extends JPanel {
         content.setBackground(new Color(245, 245, 245));
         content.setBorder(new EmptyBorder(10, 40, 20, 40));
 
-        // Stat Cards - Matching the design exactly
         JPanel topCardsPanel = new JPanel(new GridLayout(1, 4, 20, 0));
         topCardsPanel.setOpaque(false);
         topCardsPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
@@ -81,7 +80,6 @@ public class DashboardView extends JPanel {
         statusTitle.setFont(new Font("Arial", Font.BOLD, 18));
         statusPanel.add(statusTitle, BorderLayout.NORTH);
 
-        // Create parking slot containers (matching ParkingSlotView layout)
         JPanel parkingGridPanel = createParkingSlotContainers();
         statusPanel.add(parkingGridPanel, BorderLayout.CENTER);
 
@@ -89,14 +87,11 @@ public class DashboardView extends JPanel {
 
         add(content, BorderLayout.CENTER);
 
-        // Load initial data
         refreshDashboardData();
 
-        // Start auto-refresh for real-time updates
         startAutoRefresh();
     }
 
-    // Create Stats Card - Updated to match design
     private JPanel createStatsCard(String title, JLabel valueLabel, JLabel descriptionLabel) {
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout(10, 0));
@@ -132,19 +127,16 @@ public class DashboardView extends JPanel {
         return card;
     }
 
-    // Overloaded method for string descriptions
     private JPanel createStatsCard(String title, JLabel valueLabel, String description) {
         JLabel descLabel = new JLabel(description);
         return createStatsCard(title, valueLabel, descLabel);
     }
 
-    // Create parking slot containers matching ParkingSlotView layout
     private JPanel createParkingSlotContainers() {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBackground(Color.WHITE);
 
-        // Car Parking Section - matches ParkingSlotView exactly
         JPanel carSection = new JPanel(new BorderLayout());
         carSection.setBackground(Color.WHITE);
         carSection.setBorder(new EmptyBorder(0, 0, 25, 0));
@@ -161,7 +153,6 @@ public class DashboardView extends JPanel {
         carContainer.setBackground(Color.WHITE);
         carSection.add(carContainer, BorderLayout.CENTER);
 
-        // Motorcycle Parking Section - matches ParkingSlotView exactly
         JPanel motoSection = new JPanel(new BorderLayout());
         motoSection.setBackground(Color.WHITE);
 
@@ -183,24 +174,19 @@ public class DashboardView extends JPanel {
         return mainPanel;
     }
 
-    // Build grid matching ParkingSlotView's buildGrid method
     private void buildGrid(JPanel container, String type, List<ParkingSlot> slots) {
         container.removeAll();
 
-        // Use exact same grid layouts as ParkingSlotView but with correct slot counts
         if (type.equalsIgnoreCase("Car")) {
-            // Car: 2 rows of 9 slots (C1-C18)
             container.setLayout(new GridLayout(2, 9, 10, 10));
         } else {
-            // Motorcycle: 2 rows for 17 slots (M1-M17)
-            container.setLayout(new GridLayout(1, 9, 10, 10)); // 2 rows × 9 columns = 18 slots, but we'll only add 17
+            container.setLayout(new GridLayout(1, 9, 10, 10));
         }
 
-        // Sort slots by numeric part of ID (same logic as ParkingSlotView)
         List<ParkingSlot> filteredSlots = slots.stream()
                 .filter(s -> s.getType().equalsIgnoreCase(type))
                 .sorted((a, b) -> {
-                    String numA = a.getId().replaceAll("\\D+", ""); // remove letters
+                    String numA = a.getId().replaceAll("\\D+", "");
                     String numB = b.getId().replaceAll("\\D+", "");
                     int nA = numA.isEmpty() ? 0 : Integer.parseInt(numA);
                     int nB = numB.isEmpty() ? 0 : Integer.parseInt(numB);
@@ -208,14 +194,12 @@ public class DashboardView extends JPanel {
                 })
                 .toList();
 
-        // Add slots to container
         for (ParkingSlot slot : filteredSlots) {
             JButton btn = createSlotButton(slot);
             container.add(btn);
         }
 
-        // Fill remaining spaces with empty panels to maintain grid structure
-        int totalSlotsNeeded = type.equalsIgnoreCase("Car") ? 18 : 18; // Both use 2×9 grid
+        int totalSlotsNeeded = type.equalsIgnoreCase("Car") ? 18 : 18;
         int emptySlots = totalSlotsNeeded - filteredSlots.size();
         for (int i = 0; i < emptySlots; i++) {
             JPanel emptyPanel = new JPanel();
@@ -238,40 +222,31 @@ public class DashboardView extends JPanel {
         btn.setBorder(new LineBorder(slot.getColor().darker(), 2, true));
         btn.setEnabled(false); // Read-only in dashboard
 
-        // Tooltip to show status
         btn.setToolTipText(slot.getId() + " - " + slot.getStatus());
 
         return btn;
     }
 
-    // Refresh all dashboard data - SYNCED WITH ALL OTHER VIEWS
     public void refreshDashboardData() {
         try {
-            // Get parking slot data (same source as ParkingSlotView)
             List<ParkingSlot> slots = ParkingSlotDAO.getAllSlots();
 
-            // Calculate statistics - REAL-TIME OCCUPANCY RATE
             long totalSlots = slots.size();
             long occupiedSlots = slots.stream().filter(ParkingSlot::isOccupied).count();
             long availableSlots = totalSlots - occupiedSlots;
 
-            // Calculate occupancy rate with 2 decimal precision
             double occupancyRate = totalSlots > 0 ? (occupiedSlots * 100.0) / totalSlots : 0;
 
-            // Get revenue data (same source as RevenueView)
             double todayRevenue = revenueController.getTodayRevenue();
             double monthRevenue = revenueController.getMonthRevenue();
 
-            // Update labels with real-time data
             occupancyRateLabel.setText(String.format("%.2f%%", occupancyRate));
             availableSlotsLabel.setText(availableSlots + " Slots");
             todaysRevenueLabel.setText(String.format("₱%.2f", todayRevenue));
             totalRevenueLabel.setText(String.format("₱%.2f", monthRevenue));
 
-            // Update the description for occupancy rate with actual numbers
             occupancyDescriptionLabel.setText(occupiedSlots + "/" + totalSlots + " slots occupied");
 
-            // Update parking slot grids
             buildGrid(carContainer, "Car", slots);
             buildGrid(motoContainer, "Motorcycle", slots);
 
@@ -281,7 +256,6 @@ public class DashboardView extends JPanel {
         }
     }
 
-    // Auto-refresh for real-time updates (matches RevenueView functionality)
     private void startAutoRefresh() {
         refreshTimer = new Timer(5000, e -> { // Refresh every 5 seconds
             refreshDashboardData();
