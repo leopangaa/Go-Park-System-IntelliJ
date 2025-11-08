@@ -54,19 +54,14 @@ public class ParkingSlotView extends JPanel {
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
         titlePanel.setBackground(new Color(240, 242, 245));
 
-        JLabel goparkTitle = new JLabel("GOPARK");
-        goparkTitle.setFont(new Font("Arial", Font.BOLD, 24));
-        goparkTitle.setForeground(new Color(44, 62, 80));
-
-        JLabel mainTitle = new JLabel("ParkingMaster");
+        JLabel mainTitle = new JLabel("Parking Slot Management");
         mainTitle.setFont(new Font("Arial", Font.BOLD, 28));
         mainTitle.setForeground(new Color(44, 62, 80));
 
-        JLabel subtitle = new JLabel("Admin Portal");
+        JLabel subtitle = new JLabel("Monitor and manage parking operations");
         subtitle.setFont(new Font("Arial", Font.PLAIN, 16));
         subtitle.setForeground(new Color(127, 140, 141));
 
-        titlePanel.add(goparkTitle);
         titlePanel.add(Box.createVerticalStrut(5));
         titlePanel.add(mainTitle);
         titlePanel.add(Box.createVerticalStrut(5));
@@ -74,11 +69,6 @@ public class ParkingSlotView extends JPanel {
 
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.setBackground(new Color(240, 242, 245));
-
-        JLabel managementTitle = new JLabel("Parking Slot Management");
-        managementTitle.setFont(new Font("Arial", Font.BOLD, 20));
-        managementTitle.setForeground(new Color(52, 73, 94));
-        managementTitle.setHorizontalAlignment(SwingConstants.RIGHT);
 
         newEntryButton = new JButton("+ New Entry");
         newEntryButton.setFont(new Font("Arial", Font.BOLD, 14));
@@ -92,7 +82,6 @@ public class ParkingSlotView extends JPanel {
         buttonPanel.setBackground(new Color(240, 242, 245));
         buttonPanel.add(newEntryButton);
 
-        rightPanel.add(managementTitle, BorderLayout.NORTH);
         rightPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         headerPanel.add(titlePanel, BorderLayout.WEST);

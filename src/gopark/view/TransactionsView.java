@@ -20,72 +20,115 @@ public class TransactionsView extends JPanel {
 
     public TransactionsView() {
         setLayout(new BorderLayout());
-        setBackground(Color.WHITE);
+        setBackground(new Color(240, 242, 245));
         setBorder(new EmptyBorder(20, 30, 20, 30));
 
-        // ===== Header =====
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(Color.WHITE);
-
-        JPanel titlePanel = new JPanel();
-        titlePanel.setBackground(Color.WHITE);
-        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
-
-        JLabel title = new JLabel("Transaction History");
-        title.setFont(new Font("Arial", Font.BOLD, 22));
-
-        JLabel subtitle = new JLabel("View and export all parking transactions");
-        subtitle.setForeground(Color.GRAY);
-
-        titlePanel.add(title);
-        titlePanel.add(subtitle);
-        headerPanel.add(titlePanel, BorderLayout.WEST);
-
+        JPanel headerPanel = createHeaderPanel();
         add(headerPanel, BorderLayout.NORTH);
 
-        // ===== Stats Cards - Matching ParkingSlotView design =====
-        JPanel statsPanel = new JPanel(new GridLayout(1, 3, 20, 0));
-        statsPanel.setBackground(Color.WHITE);
-        statsPanel.setBorder(new EmptyBorder(10, 0, 20, 0));
+        JPanel statsPanel = createStatsPanel();
+        add(statsPanel, BorderLayout.CENTER);
 
-        totalTransactionsLabel = new JLabel("0 Completed Payments");
-        totalRevenueLabel = new JLabel("P0.00");
-        averageFeeLabel = new JLabel("P0.00");
+        JPanel tablePanel = createTablePanel();
+        add(tablePanel, BorderLayout.SOUTH);
+
+        loadTransactions();
+    }
+
+    private JPanel createHeaderPanel() {
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(new Color(240, 242, 245));
+        headerPanel.setBorder(new EmptyBorder(0, 0, 30, 0));
+
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS));
+        titlePanel.setBackground(new Color(240, 242, 245));
+
+        JLabel mainTitle = new JLabel("Transaction History");
+        mainTitle.setFont(new Font("Arial", Font.BOLD, 28));
+        mainTitle.setForeground(new Color(44, 62, 80));
+
+        JLabel subtitle = new JLabel("View and export parking transactions");
+        subtitle.setFont(new Font("Arial", Font.PLAIN, 16));
+        subtitle.setForeground(new Color(127, 140, 141));
+
+        titlePanel.add(mainTitle);
+        titlePanel.add(Box.createVerticalStrut(5));
+        titlePanel.add(subtitle);
+
+        headerPanel.add(titlePanel, BorderLayout.WEST);
+
+        return headerPanel;
+    }
+
+    private JPanel createStatsPanel() {
+        JPanel statsPanel = new JPanel(new GridLayout(1, 3, 20, 0));
+        statsPanel.setBackground(new Color(240, 242, 245));
+        statsPanel.setBorder(new EmptyBorder(0, 0, 30, 0));
+
+        totalTransactionsLabel = new JLabel("2 Completed Payments", SwingConstants.CENTER);
+        totalRevenueLabel = new JLabel("P50.00", SwingConstants.CENTER);
+        averageFeeLabel = new JLabel("P50.00", SwingConstants.CENTER);
 
         statsPanel.add(createStatCard("Total Transactions", totalTransactionsLabel));
         statsPanel.add(createStatCard("Total Revenue", totalRevenueLabel));
         statsPanel.add(createStatCard("Average Fee", averageFeeLabel));
 
-        add(statsPanel, BorderLayout.CENTER);
+        return statsPanel;
+    }
 
-        // ===== Table =====
-        JPanel tableContainer = new JPanel(new BorderLayout());
-        tableContainer.setBackground(Color.WHITE);
-
-        // Table Header
-        JPanel tableHeader = new JPanel(new BorderLayout());
-        tableHeader.setBackground(Color.WHITE);
-        tableHeader.setBorder(new EmptyBorder(10, 0, 10, 0));
-
-        JLabel tableTitle = new JLabel("All Transactions");
-        tableTitle.setFont(new Font("Arial", Font.BOLD, 16));
-
-        JTextField searchField = new JTextField("Search transactions..");
-        searchField.setForeground(Color.GRAY);
-        searchField.setPreferredSize(new Dimension(200, 30));
-        searchField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(Color.LIGHT_GRAY),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+    private JPanel createStatCard(String title, JLabel valueLabel) {
+        JPanel card = new JPanel(new BorderLayout());
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(220, 220, 220), 1),
+                new EmptyBorder(25, 20, 25, 20)
         ));
 
-        tableHeader.add(tableTitle, BorderLayout.WEST);
-        tableHeader.add(searchField, BorderLayout.EAST);
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBackground(Color.WHITE);
 
-        // ===== Define columns =====
+        // Title
+        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        titleLabel.setForeground(new Color(100, 100, 100));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Value
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        valueLabel.setForeground(new Color(60, 60, 60));
+        valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        contentPanel.add(titleLabel);
+        contentPanel.add(Box.createVerticalStrut(15));
+        contentPanel.add(valueLabel);
+
+        card.add(contentPanel, BorderLayout.CENTER);
+        return card;
+    }
+
+    private JPanel createTablePanel() {
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBackground(new Color(240, 242, 245));
+
+        // Table Title
+        JLabel tableTitle = new JLabel("All Transactions");
+        tableTitle.setFont(new Font("Arial", Font.BOLD, 22));
+        tableTitle.setForeground(new Color(44, 62, 80));
+        tableTitle.setBorder(new EmptyBorder(0, 0, 20, 0));
+
+        // Main table content panel
+        JPanel tableContent = new JPanel(new BorderLayout());
+        tableContent.setBackground(Color.WHITE);
+        tableContent.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(220, 220, 220), 1),
+                new EmptyBorder(25, 25, 25, 25)
+        ));
+
         String[] columns = {
-                "Transaction ID", "Plate Number", "Vehicle",
-                "Slot", "Entry Time", "Exit Time",
-                "Duration", "Fee", "Status"
+                "Transaction ID", "Plate Number", "Vehicle", "Slot",
+                "Entry Time", "Exit Time", "Duration", "Fee", "Status"
         };
 
         model = new DefaultTableModel(columns, 0) {
@@ -97,67 +140,44 @@ public class TransactionsView extends JPanel {
 
         transactionTable = new JTable(model);
         transactionTable.setRowHeight(35);
+        transactionTable.setFont(new Font("Arial", Font.PLAIN, 12));
 
         transactionTable.setShowHorizontalLines(true);
         transactionTable.setShowVerticalLines(true);
         transactionTable.setGridColor(new Color(220, 220, 220));
+        transactionTable.setIntercellSpacing(new Dimension(1, 0));
 
-        transactionTable.setIntercellSpacing(new Dimension(1, 1));
-        transactionTable.setFont(new Font("Arial", Font.PLAIN, 13));
-
-        transactionTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 13));
-        transactionTable.getTableHeader().setBackground(new Color(240, 240, 240));
-        transactionTable.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+        transactionTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        transactionTable.getTableHeader().setBackground(new Color(248, 249, 250));
+        transactionTable.getTableHeader().setForeground(new Color(33, 37, 41));
+        transactionTable.getTableHeader().setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(222, 226, 230)));
         transactionTable.getTableHeader().setPreferredSize(new Dimension(0, 35));
 
         setColumnWidths();
-
         transactionTable.getColumnModel().getColumn(8).setCellRenderer(new StatusCellRenderer());
 
         JScrollPane scrollPane = new JScrollPane(transactionTable);
-        scrollPane.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getViewport().setBackground(Color.WHITE);
 
-        tableContainer.add(tableHeader, BorderLayout.NORTH);
-        tableContainer.add(scrollPane, BorderLayout.CENTER);
+        tableContent.add(scrollPane, BorderLayout.CENTER);
 
-        add(tableContainer, BorderLayout.SOUTH);
+        tablePanel.add(tableTitle, BorderLayout.NORTH);
+        tablePanel.add(tableContent, BorderLayout.CENTER);
 
-        loadTransactions();
-    }
-
-    private JPanel createStatCard(String title, JLabel valueLabel) {
-        JPanel card = new JPanel();
-        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                new LineBorder(new Color(230, 230, 230), 1, true),
-                new EmptyBorder(15, 15, 15, 15)
-        ));
-
-        JLabel titleLabel = new JLabel(title);
-        titleLabel.setForeground(Color.GRAY);
-
-        valueLabel.setFont(new Font("Arial", Font.BOLD, 22));
-
-        card.add(titleLabel);
-        card.add(Box.createVerticalStrut(8));
-        card.add(valueLabel);
-
-        return card;
+        return tablePanel;
     }
 
     private void setColumnWidths() {
-        transactionTable.getColumnModel().getColumn(0).setPreferredWidth(120); // Transaction ID
+        transactionTable.getColumnModel().getColumn(0).setPreferredWidth(150); // Transaction ID
         transactionTable.getColumnModel().getColumn(1).setPreferredWidth(100); // Plate Number
         transactionTable.getColumnModel().getColumn(2).setPreferredWidth(90);  // Vehicle
         transactionTable.getColumnModel().getColumn(3).setPreferredWidth(60);  // Slot
         transactionTable.getColumnModel().getColumn(4).setPreferredWidth(150); // Entry Time
         transactionTable.getColumnModel().getColumn(5).setPreferredWidth(150); // Exit Time
         transactionTable.getColumnModel().getColumn(6).setPreferredWidth(80);  // Duration
-        transactionTable.getColumnModel().getColumn(7).setPreferredWidth(70);  // Fee
-        transactionTable.getColumnModel().getColumn(8).setPreferredWidth(80);  // Status
-
-        transactionTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        transactionTable.getColumnModel().getColumn(7).setPreferredWidth(80);  // Fee
+        transactionTable.getColumnModel().getColumn(8).setPreferredWidth(100); // Status
     }
 
     public void loadTransactions() {
@@ -200,7 +220,7 @@ public class TransactionsView extends JPanel {
         double avgFee = completedPaymentsCount > 0 ? totalRevenue / completedPaymentsCount : 0;
 
         if (totalTransactionsLabel != null) {
-            totalTransactionsLabel.setText(completedPaymentsCount + " Completed Payments");
+            totalTransactionsLabel.setText(completedPaymentsCount + "");
         }
         if (totalRevenueLabel != null) {
             totalRevenueLabel.setText("P" + String.format("%.2f", totalRevenue));
@@ -217,9 +237,10 @@ public class TransactionsView extends JPanel {
     }
 
     public static String formatReceiptNumber(int transactionId) {
-        return String.format("TID-%05d", transactionId);
+        return String.format("TXD-%05d", transactionId);
     }
 
+    // ORIGINAL StatusCellRenderer
     private class StatusCellRenderer extends DefaultTableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
