@@ -12,14 +12,12 @@ public class PaymentReceiptDialog extends JDialog {
                                 Timestamp entryTime, Timestamp exitTime, double totalFee) {
         super(parent, "Payment Receipt", true);
 
-        // === BASIC SETTINGS ===
         setSize(480, 700);
         setResizable(false);
         setLayout(new BorderLayout());
         getContentPane().setBackground(Color.WHITE);
         setLocationRelativeTo(parent);
 
-        // Add soft card border
         getRootPane().setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(220, 220, 220)),
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
@@ -33,7 +31,6 @@ public class PaymentReceiptDialog extends JDialog {
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
         main.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        // === HEADER ===
         JLabel title = new JLabel("Payment Receipt", SwingConstants.CENTER);
         title.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 18));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -47,11 +44,9 @@ public class PaymentReceiptDialog extends JDialog {
         main.add(subtitle);
         main.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        // === LOGO === (keep your original loading)
         JLabel logo = new JLabel(new ImageIcon(getClass().getResource("/gopark/assets/gopark_logo.png")));
         logo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Auto resize logo if too big
         ImageIcon icon = (ImageIcon) logo.getIcon();
         if (icon != null && icon.getIconWidth() > 160) {
             Image scaled = icon.getImage().getScaledInstance(160, -1, Image.SCALE_SMOOTH);
@@ -74,7 +69,6 @@ public class PaymentReceiptDialog extends JDialog {
 
         main.add(Box.createRigidArea(new Dimension(0, 18)));
 
-        // === RECEIPT HEADER ===
         JLabel receiptLabel = new JLabel("PARKING RECEIPT", SwingConstants.CENTER);
         receiptLabel.setOpaque(true);
         receiptLabel.setBackground(new Color(220, 0, 0));
@@ -99,7 +93,6 @@ public class PaymentReceiptDialog extends JDialog {
 
         main.add(Box.createRigidArea(new Dimension(0, 18)));
 
-        // === INFO SECTIONS ===
         JPanel infoCard = createInfoSection("Vehicle Information", new String[][]{
                 {"Plate Number:", plate},
                 {"Vehicle Type:", vType},
@@ -125,7 +118,6 @@ public class PaymentReceiptDialog extends JDialog {
         main.add(paymentCard);
         main.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // === FOOTER ===
         JLabel thanks = new JLabel("Thank you for parking with us!");
         thanks.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         thanks.setForeground(new Color(80, 80, 80));
@@ -140,7 +132,6 @@ public class PaymentReceiptDialog extends JDialog {
 
         main.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // === BUTTONS ===
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         btnPanel.setBackground(Color.WHITE);
 
@@ -158,7 +149,6 @@ public class PaymentReceiptDialog extends JDialog {
         btnPanel.add(downloadBtn);
         main.add(btnPanel);
 
-        // === SCROLLING WITHOUT SCROLLBARS ===
         JScrollPane scrollPane = new JScrollPane(main);
         scrollPane.setBorder(null);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

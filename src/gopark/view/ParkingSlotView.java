@@ -12,7 +12,6 @@ public class ParkingSlotView extends JPanel {
     private JLabel availableLabel, occupiedLabel, totalLabel;
     private JButton newEntryButton;
     private JPanel carContainer, motoContainer;
-    private JFrame topParent; // used to pass as parent to dialogs
     private Runnable refreshCallback;
 
     public ParkingSlotView(List<ParkingSlot> slots) {
@@ -98,7 +97,6 @@ public class ParkingSlotView extends JPanel {
 
         add(center, BorderLayout.CENTER);
 
-        // render initial slots
         updateSlots(slots);
     }
 

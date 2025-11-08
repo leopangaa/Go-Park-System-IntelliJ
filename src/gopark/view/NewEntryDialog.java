@@ -30,18 +30,14 @@ public class NewEntryDialog extends JDialog {
         panel.add(title);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // slot chooser
         JLabel slotLabel = new JLabel("Select Parking Slot");
         slotLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
         JComboBox<String> slotBox = new JComboBox<>();
         slotBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
         slotBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));
 
-        // load available codes from DAO
-        // load available codes from DAO
         List<String> available = ParkingSlotDAO.getAvailableSlotCodes();
 
-// ✅ Sort slot codes naturally (C1, C2, C3, ... C10, M1...)
         available.sort((a, b) -> {
             String prefixA = a.replaceAll("\\d", "");
             String prefixB = b.replaceAll("\\d", "");
@@ -52,7 +48,6 @@ public class NewEntryDialog extends JDialog {
             return (cmp == 0) ? Integer.compare(numA, numB) : cmp;
         });
 
-// populate combo box
         slotBox.addItem("Choose an available slot");
         for (String s : available) slotBox.addItem(s);
 

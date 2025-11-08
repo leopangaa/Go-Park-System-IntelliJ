@@ -33,7 +33,6 @@ public class ProcessExitDialog extends JDialog {
         String vType = (String) entry[2];
         Timestamp entryTime = (Timestamp) entry[3];
 
-        // === HEADER ===
         JLabel heading = new JLabel("Process Vehicle Exit", SwingConstants.CENTER);
         heading.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 18));
         heading.setForeground(new Color(50, 50, 50));
@@ -41,7 +40,6 @@ public class ProcessExitDialog extends JDialog {
         main.add(heading);
         main.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // === CARD ===
         JPanel card = new JPanel();
         card.setBackground(new Color(252, 249, 249));
         card.setBorder(BorderFactory.createCompoundBorder(
@@ -49,7 +47,6 @@ public class ProcessExitDialog extends JDialog {
                 BorderFactory.createEmptyBorder(20, 20, 20, 20)));
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
 
-        // Plate + Slot (horizontal layout)
         JPanel topRow = new JPanel(new BorderLayout());
         topRow.setBackground(card.getBackground());
 
@@ -72,7 +69,6 @@ public class ProcessExitDialog extends JDialog {
         card.add(sep);
         card.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        // Vehicle details
         JLabel typeLabel = new JLabel("Vehicle Type: " + vType);
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yy, hh:mm a");
         String formattedEntryTime = sdf.format(entryTime);
@@ -92,7 +88,6 @@ public class ProcessExitDialog extends JDialog {
         main.add(card);
         main.add(Box.createRigidArea(new Dimension(0, 25)));
 
-        // === BUTTONS ===
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
         buttons.setBackground(Color.WHITE);
 

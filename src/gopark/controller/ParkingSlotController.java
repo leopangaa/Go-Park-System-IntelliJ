@@ -24,9 +24,7 @@ public class ParkingSlotController {
     private void setupListeners() {
         view.getNewEntryButton().addActionListener(e -> {
             JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(view);
-            // modal dialog blocks until closed
             new NewEntryDialog(parent);
-            // after dialog closes, reload and refresh
             reloadSlots();
         });
     }

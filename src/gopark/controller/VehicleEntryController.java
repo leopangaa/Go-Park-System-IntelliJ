@@ -13,10 +13,6 @@ import java.sql.Timestamp;
 
 public class VehicleEntryController {
 
-    /**
-     * Insert a vehicle entry and set slot state to HOLD.
-     * Returns true when both insert and status update succeed.
-     */
     public static boolean addVehicleEntry(String slotCode, String plateNumber, String vehicleType) {
         String insertSQL = "INSERT INTO vehicle_entries (slot_code, plate_number, vehicle_type, entry_time) VALUES (?, ?, ?, NOW())";
         String updateSlotSQL = "UPDATE parking_slots SET status = 'HOLD' WHERE slot_code = ?";
@@ -44,11 +40,6 @@ public class VehicleEntryController {
         }
     }
 
-    /**
-     * Fetch the latest (open) vehicle entry for a slot (exit_time IS NULL).
-     * Returns an array: [entry_id (Long), plate (String), vehicle_type (String), entry_time (Timestamp)]
-     * or null if none found.
-     */
     public static Object[] loadActiveEntryForSlot(String slotCode) {
         String sql = "SELECT id, plate_number, vehicle_type, entry_time FROM vehicle_entries " +
                 "WHERE slot_code = ? AND exit_time IS NULL ORDER BY entry_time DESC LIMIT 1";
@@ -71,9 +62,6 @@ public class VehicleEntryController {
         return null;
     }
 
-    /**
-     * Close the entry (set exit_time) and record fee. Also mark slot AVAILABLE.
-     */
     public static boolean closeEntryAndFreeSlot(long entryId, String slotCode, double fee) {
         String updateEntry = "UPDATE vehicle_entries SET exit_time = NOW(), total_fee = ? WHERE id = ?";
         String updateSlot = "UPDATE parking_slots SET status = 'AVAILABLE' WHERE slot_code = ?";
@@ -99,9 +87,6 @@ public class VehicleEntryController {
         }
     }
 
-    /**
-     * Simple fee calculation: example P15 per hour (rounded up).
-     */
     public static double calculateFee(java.sql.Timestamp entryTime) {
         if (entryTime == null) return 0.0;
         LocalDateTime entry = entryTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();

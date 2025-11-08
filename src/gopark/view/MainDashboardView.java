@@ -22,14 +22,11 @@ public class MainDashboardView extends JFrame {
         sidebarView = new SidebarView();
         add(sidebarView, BorderLayout.WEST);
 
-        // Main content area
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
 
-        // Add each view
         mainPanel.add(new DashboardView(), "Dashboard");
 
-        // use controller to get the fully-initialized parking view
         ParkingSlotController parkingController = new ParkingSlotController();
         mainPanel.add(parkingController.getView(), "Parking");
 
