@@ -3,8 +3,6 @@ package gopark.view;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-
-import gopark.controller.VehicleEntryController;
 import gopark.dao.ParkingSlotDAO;
 
 import static gopark.controller.VehicleEntryController.addVehicleEntry;
@@ -32,6 +30,7 @@ public class NewEntryDialog extends JDialog {
 
         JLabel slotLabel = new JLabel("Select Parking Slot");
         slotLabel.setFont(new Font("Segoe UI", Font.BOLD, 13));
+
         JComboBox<String> slotBox = new JComboBox<>();
         slotBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 38));
         slotBox.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -43,14 +42,12 @@ public class NewEntryDialog extends JDialog {
             String prefixB = b.replaceAll("\\d", "");
             int numA = Integer.parseInt(a.replaceAll("\\D", ""));
             int numB = Integer.parseInt(b.replaceAll("\\D", ""));
-
             int cmp = prefixA.compareTo(prefixB);
             return (cmp == 0) ? Integer.compare(numA, numB) : cmp;
         });
 
         slotBox.addItem("Choose an available slot");
         for (String s : available) slotBox.addItem(s);
-
 
         panel.add(slotLabel);
         panel.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -93,9 +90,14 @@ public class NewEntryDialog extends JDialog {
             }
 
             boolean success = addVehicleEntry(slot, plate, type);
+
             if (success) {
                 JOptionPane.showMessageDialog(this, "Vehicle entry recorded successfully!");
-                dispose(); // close the modal dialog
+
+                MainDashboardView dashboard = (MainDashboardView) SwingUtilities.getWindowAncestor(this);
+                dashboard.getTransactionsView().refreshTransactions();
+
+                dispose();
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to save entry.", "Error", JOptionPane.ERROR_MESSAGE);
             }

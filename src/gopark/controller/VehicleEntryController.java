@@ -1,15 +1,12 @@
 package gopark.controller;
 
+import gopark.dao.TransactionDAO;
 import gopark.model.DBConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.sql.Timestamp;
 
 public class VehicleEntryController {
 
@@ -30,6 +27,17 @@ public class VehicleEntryController {
 
             updateStmt.setString(1, slotCode);
             updateStmt.executeUpdate();
+
+            TransactionDAO.addTransaction(
+                    plateNumber,
+                    vehicleType,
+                    slotCode,
+                    new Timestamp(System.currentTimeMillis()),
+                    null,
+                    null,
+                    0.0,
+                    "Parked"
+            );
 
             conn.commit();
             return true;
@@ -87,13 +95,13 @@ public class VehicleEntryController {
         }
     }
 
-    public static double calculateFee(java.sql.Timestamp entryTime) {
+    public static double calculateFee(Timestamp entryTime) {
         if (entryTime == null) return 0.0;
         LocalDateTime entry = entryTime.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
         LocalDateTime now = LocalDateTime.now();
         long minutes = Duration.between(entry, now).toMinutes();
-        long hours = Math.max(1, (minutes + 59) / 60); // round up, minimum 1 hour
-        double ratePerHour = 15.0; // example
+        long hours = Math.max(1, (minutes + 59) / 60);
+        double ratePerHour = 15.0;
         return hours * ratePerHour;
     }
 
@@ -113,5 +121,4 @@ public class VehicleEntryController {
             return String.format("%d minute%s", remMinutes, (remMinutes > 1 ? "s" : ""));
         }
     }
-
 }

@@ -1,6 +1,8 @@
 package gopark.view;
 
 import gopark.controller.VehicleEntryController;
+import gopark.dao.TransactionDAO;
+
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Timestamp;
@@ -56,6 +58,15 @@ public class PaymentReceiptDialog extends JDialog {
         main.add(logo);
         main.add(Box.createRigidArea(new Dimension(0, 5)));
 
+        int transactionId = TransactionDAO.markAsPaid(
+                plate,
+                exitTime,
+                VehicleEntryController.getDurationText(entryTime),
+                totalFee
+        );
+        MainDashboardView dashboard = (MainDashboardView) SwingUtilities.getWindowAncestor(this);
+        dashboard.getTransactionsView().refreshTransactions();
+
         JLabel brand = new JLabel("GoPark", SwingConstants.CENTER);
         brand.setFont(new Font("Segoe UI", Font.BOLD, 16));
         brand.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -80,7 +91,9 @@ public class PaymentReceiptDialog extends JDialog {
 
         main.add(Box.createRigidArea(new Dimension(0, 10)));
 
-        JLabel receiptId = new JLabel("Receipt #" + System.currentTimeMillis(), SwingConstants.CENTER);
+        String formattedReceipt = "Receipt #" + TransactionDAO.formatReceiptNumber(transactionId);
+        JLabel receiptId = new JLabel(formattedReceipt, SwingConstants.CENTER);
+
         receiptId.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         receiptId.setAlignmentX(Component.CENTER_ALIGNMENT);
         main.add(receiptId);

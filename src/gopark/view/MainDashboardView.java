@@ -10,6 +10,7 @@ public class MainDashboardView extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private SidebarView sidebarView;
+    private TransactionsView  transactionsView;
 
     public MainDashboardView() {
         setTitle("GoPark - Admin Portal");
@@ -30,7 +31,9 @@ public class MainDashboardView extends JFrame {
         ParkingSlotController parkingController = new ParkingSlotController();
         mainPanel.add(parkingController.getView(), "Parking");
 
-        mainPanel.add(new TransactionsView(), "Transactions");
+        transactionsView = new TransactionsView();
+        mainPanel.add(transactionsView, "Transactions");
+
         mainPanel.add(new RevenueView(), "Revenue");
         mainPanel.add(new SettingsView(), "Settings");
 
@@ -50,5 +53,9 @@ public class MainDashboardView extends JFrame {
 
     public JPanel getMainPanel() {
         return mainPanel;
+    }
+
+    public TransactionsView getTransactionsView() {
+        return transactionsView;
     }
 }
