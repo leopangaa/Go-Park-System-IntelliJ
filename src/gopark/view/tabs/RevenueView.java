@@ -5,7 +5,10 @@ import gopark.dao.DBConnection;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Map;
 
 public class RevenueView extends JPanel {
@@ -21,16 +24,17 @@ public class RevenueView extends JPanel {
 
         revenueController = new RevenueController(DBConnection.getConnection());
 
+        // ===== HEADER =====
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(Color.WHITE);
-        headerPanel.setBorder(new EmptyBorder(20, 40, 10, 40));
+        headerPanel.setBorder(new EmptyBorder(25, 40, 0, 40));
 
         JLabel title = new JLabel("Revenue Analytics");
-        title.setFont(new Font("Arial", Font.BOLD, 22));
+        title.setFont(new Font("Arial", Font.BOLD, 18));
 
         JLabel subtitle = new JLabel("Track financial performance and insights");
-        subtitle.setFont(new Font("Arial", Font.PLAIN, 14));
-        subtitle.setForeground(Color.GRAY);
+        subtitle.setFont(new Font("Arial", Font.PLAIN, 13));
+        subtitle.setForeground(Color.DARK_GRAY);
 
         JPanel titlePanel = new JPanel(new GridLayout(2, 1));
         titlePanel.setBackground(Color.WHITE);
@@ -40,44 +44,33 @@ public class RevenueView extends JPanel {
         headerPanel.add(titlePanel, BorderLayout.WEST);
         add(headerPanel, BorderLayout.NORTH);
 
+        // ===== STAT CARDS =====
         JPanel statsPanel = new JPanel(new GridLayout(1, 2, 20, 0));
-        statsPanel.setBorder(new EmptyBorder(10, 40, 20, 40));
+        statsPanel.setBorder(new EmptyBorder(20, 40, 10, 40));
         statsPanel.setBackground(Color.WHITE);
 
-        lblTodayRevenue = new JLabel("₱0.00");
-        lblMonthlyRevenue = new JLabel("₱0.00");
+        lblTodayRevenue = new JLabel("₱0.00", SwingConstants.CENTER);
+        lblMonthlyRevenue = new JLabel("₱0.00", SwingConstants.CENTER);
 
-        statsPanel.add(createStatsCard("Today's Revenue", lblTodayRevenue));
-        statsPanel.add(createStatsCard("This Month's Revenue", lblMonthlyRevenue));
+        statsPanel.add(createStatsCard("Today’s Revenue", lblTodayRevenue, new Color(220, 0, 0)));
+        statsPanel.add(createStatsCard("This Month’s Revenue", lblMonthlyRevenue, new Color(220, 0, 0)));
 
         add(statsPanel, BorderLayout.CENTER);
 
-        JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        refreshPanel.setBackground(Color.WHITE);
-        refreshPanel.setBorder(new EmptyBorder(0, 40, 10, 40));
-
-        JButton refreshButton = new JButton("Refresh Data");
-        refreshButton.setBackground(new Color(70, 130, 180));
-        refreshButton.setForeground(Color.WHITE);
-        refreshButton.setFocusPainted(false);
-        refreshButton.setFont(new Font("Arial", Font.BOLD, 12));
-        refreshButton.addActionListener(e -> refreshData());
-
-        refreshPanel.add(refreshButton);
-        add(refreshPanel, BorderLayout.SOUTH);
-
-        refreshData();
-
+        // ===== CHART CONTAINER =====
         JPanel chartContainer = new JPanel(new BorderLayout());
         chartContainer.setBorder(new EmptyBorder(10, 40, 40, 40));
         chartContainer.setBackground(Color.WHITE);
 
         JPanel chartHeader = new JPanel(new BorderLayout());
-        chartHeader.setBackground(new Color(245, 245, 245));
-        chartHeader.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        chartHeader.setBackground(new Color(250, 250, 250));
+        chartHeader.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(230, 230, 230), 1, true),
+                new EmptyBorder(12, 12, 12, 12)
+        ));
 
-        JLabel chartTitle = new JLabel("₱ MONTHLY REVENUE");
-        chartTitle.setFont(new Font("Arial", Font.BOLD, 16));
+        JLabel chartTitle = new JLabel("₱  MONTHLY REVENUE");
+        chartTitle.setFont(new Font("Arial", Font.BOLD, 15));
         chartHeader.add(chartTitle, BorderLayout.WEST);
 
         chartContainer.add(chartHeader, BorderLayout.NORTH);
@@ -88,61 +81,77 @@ public class RevenueView extends JPanel {
 
         add(chartContainer, BorderLayout.SOUTH);
 
+        refreshData();
         startAutoRefresh();
+    }
+
+    private JPanel createStatsCard(String titleText, JLabel valueLabel, Color accentColor) {
+        JPanel card = new JPanel(new BorderLayout());
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(new Color(230, 230, 230), 1, true),
+                new EmptyBorder(25, 30, 25, 30)
+        ));
+        card.setPreferredSize(new Dimension(200, 100));
+
+        ImageIcon icon = new ImageIcon(getClass().getResource("/gopark/assets/icons/revenue.png"));
+        Image scaled = icon.getImage().getScaledInstance(26, 26, Image.SCALE_SMOOTH);
+        JLabel iconLabel = new JLabel(new ImageIcon(scaled));
+        iconLabel.setHorizontalAlignment(SwingConstants.LEFT);
+
+        JLabel titleLabel = new JLabel(titleText);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 15));
+        titleLabel.setForeground(Color.BLACK);
+
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        headerPanel.setBackground(Color.WHITE);
+        headerPanel.add(iconLabel);
+        headerPanel.add(titleLabel);
+
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        valueLabel.setForeground(Color.BLACK);
+        valueLabel.setHorizontalAlignment(SwingConstants.LEFT);
+
+        card.add(headerPanel, BorderLayout.NORTH);
+        card.add(valueLabel, BorderLayout.CENTER);
+
+        card.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                card.setBorder(BorderFactory.createCompoundBorder(
+                        new LineBorder(new Color(200, 200, 200), 1, true),
+                        new EmptyBorder(23, 28, 23, 28)
+                ));
+                card.setBackground(new Color(250, 250, 250));
+                card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                card.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                card.setBorder(BorderFactory.createCompoundBorder(
+                        new LineBorder(new Color(230, 230, 230), 1, true),
+                        new EmptyBorder(25, 30, 25, 30)
+                ));
+                card.setBackground(Color.WHITE);
+                card.setCursor(Cursor.getDefaultCursor());
+                card.repaint();
+            }
+        });
+
+        return card;
     }
 
     private void refreshData() {
         try {
-            // Update stat cards
             double todaysRevenue = revenueController.getTodayRevenue();
             double monthRevenue = revenueController.getMonthRevenue();
 
-            lblTodayRevenue.setText(String.format("₱%.2f", todaysRevenue));
-            lblMonthlyRevenue.setText(String.format("₱%.2f", monthRevenue));
-
-            Map<String, Integer> monthlyRevenueData = revenueController.getMonthlyRevenue();
-            refreshChart(monthlyRevenueData);
-
-            showRefreshFeedback();
-
+            lblTodayRevenue.setText(String.format("₱%,.2f", todaysRevenue));
+            lblMonthlyRevenue.setText(String.format("₱%,.2f", monthRevenue));
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this,
-                    "Error refreshing revenue data: " + e.getMessage(),
-                    "Refresh Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private void refreshChart(Map<String, Integer> newData) {
-        Component[] components = getComponents();
-        for (Component comp : components) {
-            if (comp instanceof JPanel) {
-                JPanel panel = (JPanel) comp;
-                Component[] subComps = panel.getComponents();
-                for (Component subComp : subComps) {
-                    if (subComp instanceof RevenueChart) {
-                        panel.remove(subComp);
-                        RevenueChart newChart = new RevenueChart(newData);
-                        panel.add(newChart, BorderLayout.CENTER);
-                        panel.revalidate();
-                        panel.repaint();
-                        return;
-                    }
-                }
-            }
-        }
-    }
-
-    private void showRefreshFeedback() {
-        lblTodayRevenue.setForeground(Color.BLUE);
-        lblMonthlyRevenue.setForeground(Color.BLUE);
-
-        Timer feedbackTimer = new Timer(500, e -> {
-            lblTodayRevenue.setForeground(Color.BLACK);
-            lblMonthlyRevenue.setForeground(Color.BLACK);
-        });
-        feedbackTimer.setRepeats(false);
-        feedbackTimer.start();
     }
 
     private void startAutoRefresh() {
@@ -159,35 +168,7 @@ public class RevenueView extends JPanel {
         }
     }
 
-    private JPanel createStatsCard(String label, JLabel valueLabel) {
-        JPanel card = new JPanel(new GridLayout(1, 2));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(220, 220, 220)),
-                new EmptyBorder(20, 20, 20, 20)
-        ));
-
-        ImageIcon revenueIcon = new ImageIcon(getClass().getResource("/gopark/assets/icons/revenue.png"));
-        Image scaled = revenueIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-        JLabel icon = new JLabel(new ImageIcon(scaled));
-
-        JLabel title = new JLabel(label);
-        title.setFont(new Font("Arial", Font.BOLD, 16));
-
-        valueLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        valueLabel.setForeground(new Color(0, 100, 0));
-
-        JPanel textPanel = new JPanel(new GridLayout(2, 1));
-        textPanel.setBackground(Color.WHITE);
-        textPanel.add(title);
-        textPanel.add(valueLabel);
-
-        card.add(icon);
-        card.add(textPanel);
-
-        return card;
-    }
-
+    // ====== REVENUE CHART ======
     static class RevenueChart extends JPanel {
         private final Map<String, Integer> data;
 
@@ -195,7 +176,10 @@ public class RevenueView extends JPanel {
             this.data = data;
             setPreferredSize(new Dimension(800, 400));
             setBackground(Color.WHITE);
-            setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1, true));
+            setBorder(BorderFactory.createCompoundBorder(
+                    new LineBorder(new Color(230, 230, 230), 1, true),
+                    new EmptyBorder(20, 20, 20, 20)
+            ));
         }
 
         @Override
@@ -221,6 +205,7 @@ public class RevenueView extends JPanel {
 
             int maxValue = data.values().stream().max(Integer::compareTo).orElse(1);
             int barWidth = Math.max(30, (width - (2 * padding)) / data.size());
+            int barSpacing = 10;
 
             g2.setColor(Color.GRAY);
             g2.drawLine(padding, height - 80, width - padding, height - 80);
@@ -233,28 +218,23 @@ public class RevenueView extends JPanel {
                 int value = (i * maxValue / ySteps);
                 String label = "₱" + value;
                 FontMetrics fm = g2.getFontMetrics();
-                int labelWidth = fm.stringWidth(label);
-                g2.drawString(label, padding - labelWidth - 5, y + 4);
-                g2.drawLine(padding - 3, y, padding, y);
+                g2.drawString(label, padding - fm.stringWidth(label) - 5, y + 4);
             }
 
             int x = padding + 10;
-            int barSpacing = 10;
-
             for (Map.Entry<String, Integer> entry : data.entrySet()) {
                 int value = entry.getValue();
                 int barHeight = (int) ((value / (double) maxValue) * maxBarHeight);
                 int y = height - 80 - barHeight;
 
-                g2.setColor(Color.RED);
-                g2.fillRect(x, y, barWidth - barSpacing, barHeight);
+                g2.setColor(new Color(220, 0, 0));
+                g2.fillRoundRect(x, y, barWidth - barSpacing, barHeight, 5, 5);
 
                 g2.setColor(Color.BLACK);
                 g2.setFont(new Font("Arial", Font.BOLD, 11));
-                String valueText = "₱" + value;
+                String valueText = "₱" + String.format("%,d", value);
                 FontMetrics fm = g2.getFontMetrics();
-                int textWidth = fm.stringWidth(valueText);
-                g2.drawString(valueText, x + (barWidth - barSpacing - textWidth) / 2, y - 5);
+                g2.drawString(valueText, x + (barWidth - barSpacing - fm.stringWidth(valueText)) / 2, y - 5);
 
                 g2.setFont(new Font("Arial", Font.PLAIN, 12));
                 g2.drawString(entry.getKey(), x + (barWidth - barSpacing) / 2 - 10, height - 60);
@@ -264,7 +244,6 @@ public class RevenueView extends JPanel {
 
             g2.setFont(new Font("Arial", Font.BOLD, 13));
             g2.drawString("Month", width / 2 - 20, height - 30);
-
             g2.rotate(-Math.PI / 2);
             g2.drawString("Revenue (₱)", -height / 2 - 30, padding - 30);
             g2.rotate(Math.PI / 2);
