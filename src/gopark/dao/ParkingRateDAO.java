@@ -1,7 +1,5 @@
 package gopark.dao;
 
-import gopark.model.DBConnection;
-
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;

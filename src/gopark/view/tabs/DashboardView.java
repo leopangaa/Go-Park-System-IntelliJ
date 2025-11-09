@@ -1,8 +1,8 @@
-package gopark.view;
+package gopark.view.tabs;
 
 import gopark.controller.RevenueController;
 import gopark.dao.ParkingSlotDAO;
-import gopark.model.DBConnection;
+import gopark.dao.DBConnection;
 import gopark.model.ParkingSlot;
 
 import javax.swing.*;

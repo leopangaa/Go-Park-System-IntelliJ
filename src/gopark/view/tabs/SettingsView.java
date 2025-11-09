@@ -1,4 +1,4 @@
-package gopark.view;
+package gopark.view.tabs;
 
 import gopark.dao.ParkingRateDAO;
 
@@ -38,7 +38,7 @@ public class SettingsView extends JPanel {
         ));
 
         // Card Header
-        JLabel rateIcon = new JLabel(new ImageIcon(getClass().getResource("/gopark/assets/parking_rate_icon.png")));
+        JLabel rateIcon = new JLabel(new ImageIcon(getClass().getResource("/gopark/assets/icons/parking_rate_icon.png")));
         rateIcon.setBounds(25, 20, 40, 40);
         cardPanel.add(rateIcon);
 

@@ -1,7 +1,7 @@
-package gopark.view;
+package gopark.view.tabs;
 
 import gopark.controller.RevenueController;
-import gopark.model.DBConnection;
+import gopark.dao.DBConnection;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -167,7 +167,7 @@ public class RevenueView extends JPanel {
                 new EmptyBorder(20, 20, 20, 20)
         ));
 
-        ImageIcon revenueIcon = new ImageIcon(getClass().getResource("/gopark/assets/revenue.png"));
+        ImageIcon revenueIcon = new ImageIcon(getClass().getResource("/gopark/assets/icons/revenue.png"));
         Image scaled = revenueIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
         JLabel icon = new JLabel(new ImageIcon(scaled));
 

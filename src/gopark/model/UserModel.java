@@ -1,5 +1,7 @@
 package gopark.model;
 
+import gopark.dao.DBConnection;
+
 import java.sql.*;
 
 public class UserModel {

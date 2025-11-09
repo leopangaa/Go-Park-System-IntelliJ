@@ -2,7 +2,7 @@ package gopark.controller;
 
 import gopark.dao.TransactionDAO;
 import gopark.dao.ParkingRateDAO;
-import gopark.model.DBConnection;
+import gopark.dao.DBConnection;
 
 import java.sql.*;
 import java.time.Duration;

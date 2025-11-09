@@ -1,6 +1,10 @@
 package gopark.view;
 
 import gopark.controller.ParkingSlotController;
+import gopark.view.tabs.DashboardView;
+import gopark.view.tabs.RevenueView;
+import gopark.view.tabs.SettingsView;
+import gopark.view.tabs.TransactionsView;
 
 import javax.swing.*;
 import java.awt.*;

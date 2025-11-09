@@ -1,6 +1,5 @@
 package gopark.dao;
 
-import gopark.model.DBConnection;
 import gopark.model.ParkingSlot;
 
 import java.sql.*;

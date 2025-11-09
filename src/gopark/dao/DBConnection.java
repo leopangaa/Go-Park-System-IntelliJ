@@ -1,6 +1,5 @@
-package gopark.model;
+package gopark.dao;
 
-import javax.swing.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 

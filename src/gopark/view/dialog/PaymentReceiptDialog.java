@@ -1,7 +1,8 @@
-package gopark.view;
+package gopark.view.dialog;
 
 import gopark.controller.VehicleEntryController;
 import gopark.dao.TransactionDAO;
+import gopark.view.MainDashboardView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +47,7 @@ public class PaymentReceiptDialog extends JDialog {
         main.add(subtitle);
         main.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        JLabel logo = new JLabel(new ImageIcon(getClass().getResource("/gopark/assets/gopark_logo.png")));
+        JLabel logo = new JLabel(new ImageIcon(getClass().getResource("/gopark/assets/images/gopark_logo.png")));
         logo.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         ImageIcon icon = (ImageIcon) logo.getIcon();

@@ -2,8 +2,8 @@ package gopark.controller;
 
 import gopark.dao.ParkingSlotDAO;
 import gopark.model.ParkingSlot;
-import gopark.view.NewEntryDialog;
-import gopark.view.ParkingSlotView;
+import gopark.view.dialog.NewEntryDialog;
+import gopark.view.tabs.ParkingSlotView;
 
 import javax.swing.*;
 import java.util.List;

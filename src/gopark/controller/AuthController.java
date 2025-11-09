@@ -1,11 +1,10 @@
 package gopark.controller;
 
 import gopark.model.UserModel;
-import gopark.view.LoginView;
+import gopark.view.auth.LoginView;
 import gopark.view.MainDashboardView;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class AuthController {
 

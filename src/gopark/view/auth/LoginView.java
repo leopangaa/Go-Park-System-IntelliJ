@@ -1,4 +1,4 @@
-package gopark.view;
+package gopark.view.auth;
 
 import gopark.controller.AuthController;
 import javax.swing.*;
@@ -34,7 +34,7 @@ public class LoginView extends JFrame {
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setPreferredSize(new Dimension(450, 550));
 
-        ImageIcon bgIcon = new ImageIcon(getClass().getResource("/gopark/assets/gopark_bg.png"));
+        ImageIcon bgIcon = new ImageIcon(getClass().getResource("/gopark/assets/images/gopark_bg.png"));
         JLabel bgLabel;
         if (bgIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
             Image bgImage = bgIcon.getImage().getScaledInstance(450, 550, Image.SCALE_SMOOTH);
@@ -60,7 +60,7 @@ public class LoginView extends JFrame {
         contentPanel.setOpaque(false);
         contentPanel.setBounds(0, 0, 450, 550);
 
-        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/gopark/assets/gopark_logo.png"));
+        ImageIcon logoIcon = new ImageIcon(getClass().getResource("/gopark/assets/images/gopark_logo.png"));
         JLabel logoLabel;
         if (logoIcon.getImageLoadStatus() == MediaTracker.COMPLETE) {
             Image scaledLogo = logoIcon.getImage().getScaledInstance(400, 400, Image.SCALE_SMOOTH);

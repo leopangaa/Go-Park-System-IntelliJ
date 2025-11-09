@@ -1,6 +1,7 @@
 package gopark.controller;
 
 import gopark.view.*;
+import gopark.view.auth.LoginView;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

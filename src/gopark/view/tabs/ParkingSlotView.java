@@ -1,6 +1,7 @@
-package gopark.view;
+package gopark.view.tabs;
 
 import gopark.model.ParkingSlot;
+import gopark.view.dialog.ProcessExitDialog;
 
 import javax.swing.*;
 import javax.swing.border.*;

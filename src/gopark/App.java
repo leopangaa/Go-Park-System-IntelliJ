@@ -1,8 +1,6 @@
 package gopark;
 
-import gopark.controller.DashboardController;
-import gopark.view.LoginView;
-import gopark.view.MainDashboardView;
+import gopark.view.auth.LoginView;
 
 public class App {
     public static void main(String[] args) {

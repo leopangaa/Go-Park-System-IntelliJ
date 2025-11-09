@@ -1,4 +1,4 @@
-package gopark.view;
+package gopark.view.tabs;
 
 import gopark.dao.TransactionDAO;
 
